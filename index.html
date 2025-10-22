@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Memory EXP & Ascension Calculator — Auto</title>
+  <style>
+    :root {
+      --accent: #2ad1ff;
+      --accent-2: #6be0ff;
+      --bg1: #0a2a43;
+      --bg2: #011627;
+      --card: rgba(6,14,25,0.6);
+      --muted: #9fb6c8;
+      --glass: rgba(255,255,255,0.03);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin:0;
+      padding:28px;
+      min-height:100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+      color: #e8f8ff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .app {
+      width:100%;
+      max-width:1080px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px;
+      box-shadow: 0 12px 50px rgba(2,6,12,0.6);
+      padding:18px;
+      display:grid;
+      grid-template-columns: 1fr 380px;
+      gap:18px;
+      align-items:start;
+    }
+
+    header {
+      grid-column: 1 / -1;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding-bottom:6px;
+      border-bottom:1px solid rgba(255,255,255,0.03);
+      margin-bottom:10px;
+    }
+    header h1 { margin:0; font-size:1.15rem; }
+    header .sub { color:var(--muted); font-size:0.9rem; }
+
+    .panel {
+      background: var(--card);
+      padding:12px;
+      border-radius:10px;
+      min-height:80px;
+    }
+
+    .inputs .row { display:flex; gap:10px; margin-bottom:10px; }
+    label { display:block; font-size:0.86rem; margin-bottom:6px; color:#dff3ff; }
+    select, input[type="number"], input[type="text"] {
+      width:100%;
+      padding:8px 10px;
+      border-radius:8px;
+      border:none;
+      background: var(--glass);
+      color:#e8fbff;
+      font-size:0.95rem;
+    }
+    .small { font-size:0.82rem; color:var(--muted); }
+    .muted { color:var(--muted); }
+
+    .controls {
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-top:6px;
+    }
+
+    .btn {
+      padding:9px 12px;
+      border-radius:8px;
+      border:none;
+      cursor:pointer;
+      font-weight:700;
+      background: linear-gradient(90deg,var(--accent),var(--accent-2));
+      color:#012033;
+      box-shadow: 0 6px 18px rgba(10,200,255,0.06);
+    }
+
+    .ghost {
+      background: rgba(255,255,255,0.03);
+      color:#eaffff;
+      border: 1px solid rgba(255,255,255,0.03);
+      padding:8px 10px;
+      border-radius:8px;
+      cursor:pointer;
+    }
+
+    .results {
+      margin-top:12px;
+      font-size:0.95rem;
+      line-height:1.5;
+    }
+
+    .big { font-size:1.15rem; font-weight:800; color:#e6fbff; }
+
+    .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+
+    .info-icon {
+      display:inline-block;
+      width:18px; height:18px;
+      border-radius:50%;
+      background: rgba(255,255,255,0.06);
+      color:var(--accent-2);
+      text-align:center;
+      line-height:18px;
+      font-weight:700;
+      margin-left:6px;
+      cursor:default;
+      font-size:12px;
+    }
+
+    /* table */
+    .table-wrap { margin-top:12px; }
+    table { width:100%; border-collapse:collapse; font-size:0.9rem; }
+    th, td { text-align:left; padding:8px 6px; border-bottom:1px solid rgba(255,255,255,0.03); }
+    th { color:var(--muted); font-weight:700; font-size:0.85rem; }
+    tfoot td { font-weight:800; }
+
+    .toggle-row { display:flex; align-items:center; gap:8px; margin-top:8px; }
+
+    footer { grid-column: 1 / -1; color:var(--muted); font-size:0.82rem; margin-top:8px; text-align:center; }
+
+    @media (max-width:980px) {
+      .app { grid-template-columns: 1fr; padding:14px; }
+      .panel { margin-bottom:8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="Memory EXP and Ascension Calculator">
+    <header>
+      <div>
+        <h1>Memory EXP & Ascension Calculator</h1>
+        <div class="sub">Auto-calculates as you type — includes ascension materials & book equivalents</div>
+      </div>
+      <div class="muted">Conversion: 1 gold-book = 3 purple = 9 blue = 27 green <span class="info-icon" title="1 gold-book → 3 purple → each purple → 3 blue → each blue → 3 green">i</span></div>
+    </header>
+
+    <!-- LEFT: inputs + results -->
+    <section class="panel inputs" aria-label="Main controls">
+      <div class="row" style="margin-bottom:12px">
+        <div style="flex:1">
+          <label>Rarity (aesthetic)</label>
+          <select id="raritySelect" aria-label="rarity">
+            <option>UR</option>
+            <option>SSR</option>
+          </select>
+        </div>
+        <div style="width:130px">
+          <label>From (initial)</label>
+          <select id="initialLevel" aria-label="initial level">
+            <option value="1">1</option>
+            <option value="20">20</option>
+            <option value="40">40</option>
+            <option value="60">60</option>
+            <option value="70">70</option>
+          </select>
+        </div>
+        <div style="width:130px">
+          <label>To (target)</label>
+          <select id="finalLevel" aria-label="final level">
+            <option value="20">20</option>
+            <option value="40">40</option>
+            <option value="60">60</option>
+            <option value="70">70</option>
+            <option value="80">80</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <label>Total EXP options <span class="small muted">(Hover the info for book values)</span></label>
+          <div style="background:var(--glass); padding:8px; border-radius:8px;">
+            <div id="allGreenLine" class="small">All green: —</div>
+            <div id="allBlueLine" class="small">All blue: —</div>
+            <div id="halfBooksLine" class="small">Half books (near-equal counts): —</div>
+          </div>
+        </div>
+
+        <div>
+          <label>Quick actions</label>
+          <div style="display:flex; gap:8px;">
+            <button class="btn" id="copyBtn" title="Copy summary to clipboard">Copy Results</button>
+            <button class="ghost" id="resetBtn" title="Reset owned counts & selections">Reset</button>
+          </div>
+          <div class="small muted" style="margin-top:8px">Tooltips: hover <span class="info-icon" title="Green exp book = 100 XP\nBlue exp book = 1000 XP">i</span></div>
+        </div>
+      </div>
+
+      <div class="results" id="summaryBlock" aria-live="polite">
+        <div class="muted">Select start/end levels and enter owned books on the right — results update automatically.</div>
+      </div>
+
+      <div class="toggle-row">
+        <input type="checkbox" id="showDetails" />
+        <label for="showDetails" class="small">Show detailed per-segment and ascension table</label>
+      </div>
+
+      <div class="table-wrap" id="tableWrap" style="display:none"></div>
+    </section>
+
+    <!-- RIGHT: Owned resources -->
+    <aside class="panel" aria-label="Owned resources">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-weight:700">Owned EXP books</div>
+          <div class="small muted">Green = 100 XP, Blue = 1000 XP <span class="info-icon" title="Green book = 100 XP; Blue book = 1000 XP">i</span></div>
+        </div>
+      </div>
+
+      <div style="margin-top:8px" class="row">
+        <div style="flex:1">
+          <label>Owned green exp books</label>
+          <input id="ownedGreenExp" type="number" min="0" value="0" />
+        </div>
+        <div style="flex:1">
+          <label>Owned blue exp books</label>
+          <input id="ownedBlueExp" type="number" min="0" value="0" />
+        </div>
+      </div>
+
+      <hr style="border:none; border-top:1px solid rgba(255,255,255,0.03); margin:10px 0" />
+
+      <div>
+        <div style="font-weight:700">Owned Ascension Books</div>
+        <div class="small muted">Green / Blue / Purple / Gold</div>
+      </div>
+
+      <div style="margin-top:8px" class="row">
+        <div style="flex:1">
+          <label>Owned green ascension</label>
+          <input id="ownedAscGreen" type="number" min="0" value="0" />
+        </div>
+        <div style="flex:1">
+          <label>Owned blue ascension</label>
+          <input id="ownedAscBlue" type="number" min="0" value="0" />
+        </div>
+      </div>
+
+      <div style="margin-top:8px">
+        <label>Owned purple ascension</label>
+        <input id="ownedAscPurple" type="number" min="0" value="0" />
+      </div>
+
+      <div style="margin-top:8px">
+        <label>Owned gold ascension</label>
+        <input id="ownedAscGold" type="number" min="0" value="0" />
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="small muted">Design: chill dark-blue theme • auto-calc • tooltips</div>
+      </div>
+    </aside>
+
+    <footer>Data and values match the numbers you provided; EXP conversions: green=100, blue=1000.</footer>
+  </div>
+
+  <script>
+    /**********************
+     * Data (from user)
+     **********************/
+    // segments: exp books (green count and blue count) and gold per segment
+    const segments = {
+      "1-20": { greenExpBooks: 61, blueExpBooks: 0, gold: 12200 },
+      "20-40": { greenExpBooks: 856, blueExpBooks: 0, gold: 171200 },
+      "40-60": { greenExpBooks: 4100, blueExpBooks: 0, gold: 820000 },
+      "60-70": { greenExpBooks: 573, blueExpBooks: 249, gold: 613400 },
+      "70-80": { greenExpBooks: 4, blueExpBooks: 392, gold: 784800 }
+    };
+
+    // ascensions at boundaries (ascend at 20, 40, 60, 70)
+    const ascensions = {
+      "20": { greenBooks: 8, blueBooks: 0, purpleBooks: 0, goldBooks: 0, gold: 30000 },   // ascension 20/40
+      "40": { greenBooks: 40, blueBooks: 12, purpleBooks: 0, goldBooks: 0, gold: 80000 }, // ascension 40/60
+      "60": { greenBooks: 0, blueBooks: 50, purpleBooks: 16, goldBooks: 0, gold: 200000 },// ascension 60/70
+      "70": { greenBooks: 0, blueBooks: 0, purpleBooks: 58, goldBooks: 20, gold: 500000 } // ascension 70/80 (20 gold books etc)
+    };
+
+    // order of segments for inclusion
+    const segmentOrder = [
+      { key: "1-20", from: 1, to: 20 },
+      { key: "20-40", from: 20, to: 40 },
+      { key: "40-60", from: 40, to: 60 },
+      { key: "60-70", from: 60, to: 70 },
+      { key: "70-80", from: 70, to: 80 }
+    ];
+
+    // constants
+    const EXP_GREEN = 100;
+    const EXP_BLUE = 1000;
+
+    // ascension conversion chain:
+    // goldBook -> 3 purple
+    // purple -> 3 blue
+    // blue -> 3 green
+    // so 1 gold = 3 purple = 9 blue = 27 green
+
+    /**********************
+     * DOM refs & event setup
+     **********************/
+    const initialEl = document.getElementById('initialLevel');
+    const finalEl = document.getElementById('finalLevel');
+    const ownedGreenExpEl = document.getElementById('ownedGreenExp');
+    const ownedBlueExpEl = document.getElementById('ownedBlueExp');
+    const ownedAscGreenEl = document.getElementById('ownedAscGreen');
+    const ownedAscBlueEl = document.getElementById('ownedAscBlue');
+    const ownedAscPurpleEl = document.getElementById('ownedAscPurple');
+    const ownedAscGoldEl = document.getElementById('ownedAscGold');
+    const copyBtn = document.getElementById('copyBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const showDetailsEl = document.getElementById('showDetails');
+    const tableWrap = document.getElementById('tableWrap');
+
+    // wire auto-update events
+    const inputsToWatch = [
+      initialEl, finalEl,
+      ownedGreenExpEl, ownedBlueExpEl,
+      ownedAscGreenEl, ownedAscBlueEl, ownedAscPurpleEl, ownedAscGoldEl
+    ];
+    inputsToWatch.forEach(el => el.addEventListener('input', debounce(computeAndRender, 120)));
+    showDetailsEl.addEventListener('change', computeAndRender);
+    copyBtn.addEventListener('click', copySummary);
+    resetBtn.addEventListener('click', resetAll);
+
+    // initial compute
+    computeAndRender();
+
+    /**********************
+     * Core logic
+     **********************/
+    function computeAndRender() {
+      const initial = parseInt(initialEl.value, 10);
+      const final = parseInt(finalEl.value, 10);
+      const summaryBlock = document.getElementById('summaryBlock');
+
+      if (isNaN(initial) || isNaN(final) || final <= initial) {
+        summaryBlock.innerHTML = `<div class="muted">Choose valid initial & target levels (target must be greater than initial).</div>`;
+        tableWrap.style.display = 'none';
+        return;
+      }
+
+      // get segments included
+      const segKeys = getSegmentsBetween(initial, final);
+      const segmentDetails = segKeys.map(k => {
+        const s = segments[k];
+        const expFromGreen = (s.greenExpBooks || 0) * EXP_GREEN;
+        const expFromBlue = (s.blueExpBooks || 0) * EXP_BLUE;
+        const expTotal = expFromGreen + expFromBlue;
+        return { range: k, green: s.greenExpBooks || 0, blue: s.blueExpBooks || 0, exp: expTotal, gold: s.gold || 0 };
+      });
+
+      // total exp and gold from leveling segments
+      const totalExp = segmentDetails.reduce((s,x)=> s + x.exp, 0);
+      const totalLevelGold = segmentDetails.reduce((s,x)=> s + (x.gold||0), 0);
+
+      // EXP options:
+      const allGreenCount = Math.ceil(totalExp / EXP_GREEN);
+      const allBlueCount = Math.ceil(totalExp / EXP_BLUE);
+
+      // half-books (try to make green & blue counts as equal as possible while covering totalExp)
+      const halfBooksPair = computeHalfBooks(totalExp);
+
+      // Ascensions included: those with boundary > initial and <= final
+      const ascNeeded = { greenBooks:0, blueBooks:0, purpleBooks:0, goldBooks:0, gold:0 };
+      [20,40,60,70].forEach(bound => {
+        if (bound > initial && bound <= final) {
+          const a = ascensions[String(bound)];
+          ascNeeded.greenBooks += a.greenBooks || 0;
+          ascNeeded.blueBooks += a.blueBooks || 0;
+          ascNeeded.purpleBooks += a.purpleBooks || 0;
+          ascNeeded.goldBooks += a.goldBooks || 0;
+          ascNeeded.gold += a.gold || 0;
+        }
+      });
+
+      // equivalents
+      const totalPurpleEq = (ascNeeded.goldBooks * 3) + ascNeeded.purpleBooks;
+      const totalBlueEq = (ascNeeded.goldBooks * 9) + (ascNeeded.purpleBooks * 3) + ascNeeded.blueBooks; // gold*9 because 1 gold=9 blue
+      const totalGreenEq = (totalBlueEq * 3) + ascNeeded.greenBooks;
+
+      // owned resources
+      const ownedGreenExp = Math.max(0, parseInt(ownedGreenExpEl.value || 0, 10));
+      const ownedBlueExp = Math.max(0, parseInt(ownedBlueExpEl.value || 0, 10));
+      const ownedAscGreen = Math.max(0, parseInt(ownedAscGreenEl.value || 0, 10));
+      const ownedAscBlue = Math.max(0, parseInt(ownedAscBlueEl.value || 0, 10));
+      const ownedAscPurple = Math.max(0, parseInt(ownedAscPurpleEl.value || 0, 10));
+      const ownedAscGold = Math.max(0, parseInt(ownedAscGoldEl.value || 0, 10));
+
+      const ownedExpRaw = (ownedGreenExp * EXP_GREEN) + (ownedBlueExp * EXP_BLUE);
+      const expRemaining = Math.max(totalExp - ownedExpRaw, 0);
+
+      // Ascensions still needed per raw tier
+      const neededAscGreen = Math.max(ascNeeded.greenBooks - ownedAscGreen, 0);
+      const neededAscBlue = Math.max(ascNeeded.blueBooks - ownedAscBlue, 0);
+      const neededAscPurple = Math.max(ascNeeded.purpleBooks - ownedAscPurple, 0);
+      const neededAscGold = Math.max(ascNeeded.goldBooks - ownedAscGold, 0);
+
+      // Owned equivalents for comparison
+      const ownedTotalBlueEq = (ownedAscGold * 9) + (ownedAscPurple * 3) + ownedAscBlue;
+      const ownedTotalGreenEq = (ownedTotalBlueEq * 3) + ownedAscGreen;
+
+      const remainingBlueEq = Math.max(totalBlueEq - ownedTotalBlueEq, 0);
+      const remainingGreenEq = Math.max(totalGreenEq - ownedTotalGreenEq, 0);
+
+      // Build UI summary
+      let html = '';
+      html += `<div class="big">Total EXP required: ${totalExp.toLocaleString()} XP</div>`;
+      html += `<div class="small muted" style="margin-top:6px">Level-up gold (segments): ${totalLevelGold.toLocaleString()} • Ascension gold: ${ascNeeded.gold.toLocaleString()}</div>`;
+
+      html += `<div style="margin-top:10px"><strong>EXP book options</strong></div>`;
+      html += `<div style="margin-top:6px">
+        <div id="line1">All green: <strong>${allGreenCount.toLocaleString()} green</strong> (provides ${(allGreenCount*EXP_GREEN).toLocaleString()} XP)</div>
+        <div id="line2">All blue: <strong>${allBlueCount.toLocaleString()} blue</strong> (provides ${(allBlueCount*EXP_BLUE).toLocaleString()} XP)</div>
+        <div id="line3">Half-books: <strong>${halfBooksPair.green.toLocaleString()} green + ${halfBooksPair.blue.toLocaleString()} blue</strong> (provides ${(halfBooksPair.green*EXP_GREEN + halfBooksPair.blue*EXP_BLUE).toLocaleString()} XP)</div>
+      </div>`;
+
+      html += `<div style="margin-top:12px"><strong>Ascension materials required (raw)</strong></div>`;
+      html += `<div style="margin-top:6px">
+        <div>Green: <strong>${ascNeeded.greenBooks}</strong></div>
+        <div>Blue: <strong>${ascNeeded.blueBooks}</strong></div>
+        <div>Purple: <strong>${ascNeeded.purpleBooks}</strong></div>
+        <div>Gold: <strong>${ascNeeded.goldBooks}</strong></div>
+        <div class="small muted" style="margin-top:6px">Equivalent totals → Blue-equivalent: <strong>${totalBlueEq.toLocaleString()}</strong>, Green-equivalent: <strong>${totalGreenEq.toLocaleString()}</strong></div>
+      </div>`;
+
+      html += `<div style="margin-top:12px"><strong>Your owned resources</strong></div>`;
+      html += `<div style="margin-top:6px">
+        <div>Owned EXP: <strong>${ownedExpRaw.toLocaleString()}</strong> XP → EXP remaining: <strong>${expRemaining.toLocaleString()}</strong> XP</div>
+        <div style="margin-top:6px">Ascension still needed (per-tier): <strong>Green:</strong> ${neededAscGreen} • <strong>Blue:</strong> ${neededAscBlue} • <strong>Purple:</strong> ${neededAscPurple} • <strong>Gold:</strong> ${neededAscGold}</div>
+        <div class="small muted" style="margin-top:6px">Equivalent remaining: <strong>${remainingBlueEq.toLocaleString()}</strong> blue-equivalent or <strong>${remainingGreenEq.toLocaleString()}</strong> green-equivalent</div>
+      </div>`;
+
+      summaryBlock.innerHTML = html;
+
+      // update small lines
+      document.getElementById('allGreenLine').innerText = `All green: ${allGreenCount.toLocaleString()} green books (${(allGreenCount*EXP_GREEN).toLocaleString()} XP)`;
+      document.getElementById('allBlueLine').innerText = `All blue: ${allBlueCount.toLocaleString()} blue books (${(allBlueCount*EXP_BLUE).toLocaleString()} XP)`;
+      document.getElementById('halfBooksLine').innerText = `Half-books: ${halfBooksPair.green.toLocaleString()} green + ${halfBooksPair.blue.toLocaleString()} blue (provides ${(halfBooksPair.green*EXP_GREEN + halfBooksPair.blue*EXP_BLUE).toLocaleString()} XP)`;
+
+      // render details table if checkbox checked
+      if (showDetailsEl.checked) {
+        renderDetailsTable(segmentDetails, ascNeeded, {
+          totalExp, totalLevelGold, halfBooksPair, allGreenCount, allBlueCount,
+          totalBlueEq, totalGreenEq, ownedExpRaw, expRemaining,
+          neededAscGreen, neededAscBlue, neededAscPurple, neededAscGold
+        });
+      } else {
+        tableWrap.style.display = 'none';
+      }
+    }
+
+    /**********************
+     * Utility functions
+     **********************/
+    function getSegmentsBetween(initial, final) {
+      const keys = [];
+      for (const seg of segmentOrder) {
+        // include if the segment overlaps the (initial, final] range
+        // segment [from,to] should be included if seg.to > initial && seg.from < final
+        if (seg.to > initial && seg.from < final) {
+          keys.push(seg.key);
+        }
+      }
+      return keys;
+    }
+
+    // find a pair of (green, blue) counts where green and blue counts are as equal as possible
+    // while ensuring green*100 + blue*1000 >= totalExp and minimizing total books
+    function computeHalfBooks(totalExp) {
+      // brute force search across reasonable range
+      const maxBlue = Math.ceil(totalExp / EXP_BLUE) + 50;
+      const maxGreen = Math.ceil(totalExp / EXP_GREEN) + 200;
+      let best = { green: Math.ceil(totalExp/EXP_GREEN), blue: 0, totalBooks: Math.ceil(totalExp/EXP_GREEN), diff: Math.abs(Math.ceil(totalExp/EXP_GREEN) - 0) };
+
+      // search b from 0..maxBlue
+      for (let b = 0; b <= maxBlue; b++) {
+        // minimal greens required given b blues
+        const remainingExp = Math.max(0, totalExp - (b * EXP_BLUE));
+        const g = Math.ceil(remainingExp / EXP_GREEN);
+        const provided = g * EXP_GREEN + b * EXP_BLUE;
+        if (provided < totalExp) continue;
+        const totalBooks = g + b;
+        const diff = Math.abs(g - b);
+        // prefer smaller diff (more equal), then smaller totalBooks
+        if (diff < best.diff || (diff === best.diff && totalBooks < best.totalBooks)) {
+          best = { green: g, blue: b, totalBooks, diff };
+        }
+        // early exit if perfect equality and minimal possible books
+        if (diff === 0 && totalBooks <= Math.ceil(totalExp / EXP_GREEN)) break;
+      }
+
+      // also ensure best.green/best.blue are non-negative
+      best.green = Math.max(0, best.green);
+      best.blue = Math.max(0, best.blue);
+      return { green: best.green, blue: best.blue };
+    }
+
+    function renderDetailsTable(segmentDetails, ascNeeded, extras) {
+      // build HTML table
+      let html = `<div style="background:rgba(0,0,0,0.25); padding:10px; border-radius:8px;">
+        <div style="font-weight:800; margin-bottom:8px">Detailed breakdown</div>
+        <table role="table" aria-label="Segment breakdown">
+          <thead><tr><th>Segment</th><th>Green books</th><th>Blue books</th><th>EXP</th><th>Gold</th></tr></thead>
+          <tbody>`;
+      let totalExp = 0, totalGold = 0;
+      segmentDetails.forEach(s => {
+        html += `<tr><td>${s.range}</td><td>${(s.green||0).toLocaleString()}</td><td>${(s.blue||0).toLocaleString()}</td><td>${(s.exp||0).toLocaleString()} XP</td><td>${(s.gold||0).toLocaleString()}</td></tr>`;
+        totalExp += s.exp||0;
+        totalGold += s.gold||0;
+      });
+      html += `</tbody><tfoot><tr><td>Total</td><td></td><td></td><td>${totalExp.toLocaleString()} XP</td><td>${totalGold.toLocaleString()}</td></tr></tfoot></table>`;
+
+      // ascension table
+      html += `<div style="margin-top:12px; font-weight:800">Ascension requirements</div>`;
+      html += `<table role="table" aria-label="Ascension totals" style="margin-top:8px">
+        <thead><tr><th>Type</th><th>Count</th></tr></thead>
+        <tbody>
+          <tr><td>Green</td><td>${ascNeeded.greenBooks}</td></tr>
+          <tr><td>Blue</td><td>${ascNeeded.blueBooks}</td></tr>
+          <tr><td>Purple</td><td>${ascNeeded.purpleBooks}</td></tr>
+          <tr><td>Gold</td><td>${ascNeeded.goldBooks}</td></tr>
+          <tr><td style="font-weight:800">Ascension gold</td><td style="font-weight:800">${ascNeeded.gold.toLocaleString()}</td></tr>
+        </tbody>
+      </table>`;
+
+      // extras
+      html += `<div style="margin-top:12px"><div style="font-weight:800">Quick totals</div>
+        <div class="small muted" style="margin-top:6px">All-green books needed: <strong>${extras.allGreenCount?.toLocaleString() || Math.ceil(totalExp/EXP_GREEN).toLocaleString()}</strong></div>
+        <div class="small muted">All-blue books needed: <strong>${extras.allBlueCount?.toLocaleString() || Math.ceil(totalExp/EXP_BLUE).toLocaleString()}</strong></div>
+        <div class="small muted">Half-books (green + blue): <strong>${extras.halfBooksPair?.green.toLocaleString() || ''} + ${extras.halfBooksPair?.blue.toLocaleString() || ''}</strong></div>
+        <div class="small muted" style="margin-top:6px">Equivalent totals → Blue-equivalent: <strong>${extras.totalBlueEq?.toLocaleString()}</strong>, Green-equivalent: <strong>${extras.totalGreenEq?.toLocaleString()}</strong></div>
+      </div>`;
+
+      html += `</div>`;
+      tableWrap.innerHTML = html;
+      tableWrap.style.display = 'block';
+    }
+
+    // copy summary to clipboard
+    function copySummary() {
+      // build a plain-text summary
+      const initial = parseInt(initialEl.value,10);
+      const final = parseInt(finalEl.value,10);
+      const summaryText = document.getElementById('summaryBlock').innerText || 'Results';
+      const header = `Memory EXP & Ascension Summary — From ${initial} to ${final}\n\n`;
+      const payload = header + summaryText;
+      navigator.clipboard.writeText(payload).then(() => {
+        copyBtn.innerText = 'Copied!';
+        setTimeout(()=> copyBtn.innerText = 'Copy Results', 1200);
+      }).catch(() => {
+        alert('Copy failed — your browser may block clipboard. You can manually select & copy.');
+      });
+    }
+
+    function resetAll() {
+      // reset owned counts to zero and choose defaults
+      ownedGreenExpEl.value = 0;
+      ownedBlueExpEl.value = 0;
+      ownedAscGreenEl.value = 0;
+      ownedAscBlueEl.value = 0;
+      ownedAscPurpleEl.value = 0;
+      ownedAscGoldEl.value = 0;
+      initialEl.value = "1";
+      finalEl.value = "20";
+      document.getElementById('raritySelect').value = "UR";
+      showDetailsEl.checked = false;
+      computeAndRender();
+    }
+
+    // debounce helper
+    function debounce(fn, wait) {
+      let t = null;
+      return function(...args) {
+        if (t) clearTimeout(t);
+        t = setTimeout(()=> fn.apply(this, args), wait);
+      };
+    }
+  </script>
+</body>
+</html>
