@@ -110,6 +110,7 @@ th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
       <p id="expNeeded">EXP Needed: 0</p>
       <p id="goldNeeded">Gold Needed: 0</p>
       <p id="ascNeeded">Ascension Books Needed: 0</p>
+      <p id="ascEquivalent"></p>
       <button id="copyBtn">Copy Results</button>
     </div>
   </div>
@@ -117,7 +118,7 @@ th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
 
 <div class="container">
   <div class="card">
-    <button onclick="toggleDetails()">Show/Hide Detailed Table</button>
+    <button id="toggleTableBtn">Show Detailed Table</button>
     <div class="details" id="detailsTable">
       <h3>Detailed EXP & Ascension Table</h3>
       <table>
@@ -139,19 +140,19 @@ th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
 </div>
 
 <script>
-// EXP book values
+// EXP values
 const EXP_VALUES = {green:100, blue:1000};
 
 // Level data
 const levels = [
   {range:"1-20", exp:{green:61, blue:0}, gold:12200, asc:{}},
-  {range:"20-40", exp:{green:856, blue:0}, gold:171200, asc:{green:8, blue:0, purple:0, gold:0}, ascGold:30000},
-  {range:"40-60", exp:{green:4100, blue:0}, gold:820000, asc:{green:40, blue:12, purple:0, gold:0}, ascGold:80000},
-  {range:"60-70", exp:{green:573, blue:249}, gold:613400, asc:{green:0, blue:50, purple:16, gold:0}, ascGold:200000},
-  {range:"70-80", exp:{green:4, blue:392}, gold:784800, asc:{green:0, blue:0, purple:58, gold:20}, ascGold:500000}
+  {range:"20-40", exp:{green:856, blue:0}, gold:171200, asc:{green:8, blue:0, purple:0, gold:0}},
+  {range:"40-60", exp:{green:4100, blue:0}, gold:820000, asc:{green:40, blue:12, purple:0, gold:0}},
+  {range:"60-70", exp:{green:573, blue:249}, gold:613400, asc:{green:0, blue:50, purple:16, gold:0}},
+  {range:"70-80", exp:{green:4, blue:392}, gold:784800, asc:{green:0, blue:0, purple:58, gold:20}}
 ];
 
-// Get elements
+// Elements
 const startLevelEl = document.getElementById("startLevel");
 const targetLevelEl = document.getElementById("targetLevel");
 const greenExpEl = document.getElementById("greenExp");
@@ -163,31 +164,30 @@ const goldAscEl = document.getElementById("goldAsc");
 const expNeededEl = document.getElementById("expNeeded");
 const goldNeededEl = document.getElementById("goldNeeded");
 const ascNeededEl = document.getElementById("ascNeeded");
+const ascEquivalentEl = document.getElementById("ascEquivalent");
 const tableBodyEl = document.getElementById("tableBody");
+const detailsTable = document.getElementById("detailsTable");
+const toggleTableBtn = document.getElementById("toggleTableBtn");
 
 // Toggle table
-function toggleDetails() {
-  const details = document.getElementById("detailsTable");
-  details.style.display = details.style.display === "none" ? "block" : "none";
-}
+toggleTableBtn.addEventListener("click", () => {
+  if(detailsTable.style.display === "none" || detailsTable.style.display === ""){
+    detailsTable.style.display = "block";
+    toggleTableBtn.textContent = "Hide Detailed Table";
+  } else {
+    detailsTable.style.display = "none";
+    toggleTableBtn.textContent = "Show Detailed Table";
+  }
+});
 
 // Copy results
 document.getElementById("copyBtn").addEventListener("click", () => {
-  const text = `EXP Needed: ${expNeededEl.textContent}\nGold Needed: ${goldNeededEl.textContent}\n${ascNeededEl.textContent}`;
+  const text = `EXP Needed: ${expNeededEl.textContent}\nGold Needed: ${goldNeededEl.textContent}\n${ascNeededEl.textContent}\n${ascEquivalentEl.textContent}`;
   navigator.clipboard.writeText(text);
   alert("Results copied to clipboard!");
 });
 
-// Helper to convert ascension books
-function convertToGreen(total) {
-  return total.gold*27 + total.purple*9 + total.blue*3 + total.green;
-}
-
-function convertToBlue(total) {
-  return total.gold*9 + total.purple*3 + total.blue + total.green/3;
-}
-
-// Calculation function
+// Calculate function
 function calculate() {
   const start = parseInt(startLevelEl.value);
   const target = parseInt(targetLevelEl.value);
@@ -195,11 +195,11 @@ function calculate() {
   let totalExp = 0, totalGold = 0;
   let totalAsc = {green:0, blue:0, purple:0, gold:0};
 
-  levels.forEach(l => {
+  levels.forEach(l=>{
     const levelStart = parseInt(l.range.split("-")[0]);
     const levelEnd = parseInt(l.range.split("-")[1]);
     if(start < levelEnd && target > levelStart){
-      totalExp += (l.exp.green*EXP_VALUES.green + l.exp.blue*EXP_VALUES.blue);
+      totalExp += l.exp.green*EXP_VALUES.green + l.exp.blue*EXP_VALUES.blue;
       totalGold += l.gold;
       if(l.asc.green) totalAsc.green += l.asc.green;
       if(l.asc.blue) totalAsc.blue += l.asc.blue;
@@ -208,22 +208,54 @@ function calculate() {
     }
   });
 
-  // Subtract user resources
   const userExp = greenExpEl.value*EXP_VALUES.green + blueExpEl.value*EXP_VALUES.blue;
   const remainingExp = Math.max(totalExp - userExp,0);
 
-  const remainingAsc = {
-    green: Math.max(totalAsc.green - greenAscEl.value,0),
-    blue: Math.max(totalAsc.blue - blueAscEl.value,0),
-    purple: Math.max(totalAsc.purple - purpleAscEl.value,0),
-    gold: Math.max(totalAsc.gold - goldAscEl.value,0)
+  let userAsc = {
+    green: parseInt(greenAscEl.value),
+    blue: parseInt(blueAscEl.value),
+    purple: parseInt(purpleAscEl.value),
+    gold: parseInt(goldAscEl.value)
   };
+
+  // Remaining asc after user input
+  let rem = {
+    green: Math.max(totalAsc.green - userAsc.green,0),
+    blue: Math.max(totalAsc.blue - userAsc.blue,0),
+    purple: Math.max(totalAsc.purple - userAsc.purple,0),
+    gold: Math.max(totalAsc.gold - userAsc.gold,0)
+  };
+
+  // Auto-convert lower-tier books
+  let extra = {
+    green: Math.max(userAsc.green - totalAsc.green,0),
+    blue: Math.max(userAsc.blue - totalAsc.blue,0),
+    purple: Math.max(userAsc.purple - totalAsc.purple,0)
+  };
+
+  let conv = {blue:0, purple:0, gold:0};
+
+  // Green -> Blue
+  if(extra.green>0){ conv.blue = Math.floor(extra.green/3); extra.green %=3;}
+  // Blue -> Purple
+  if(extra.blue + conv.blue >0){ conv.purple = Math.floor((extra.blue + conv.blue)/3); conv.blue = (extra.blue + conv.blue)%3;}
+  // Purple -> Gold
+  if(extra.purple + conv.purple >0){ conv.gold = Math.floor((extra.purple + conv.purple)/3); conv.purple = (extra.purple + conv.purple)%3;}
+
+  let ascText = `Green:${rem.green} Blue:${rem.blue}${conv.blue>0? ` (${conv.blue} converted)`:""} Purple:${rem.purple}${conv.purple>0? ` (${conv.purple} converted)`:""} Gold:${rem.gold}${conv.gold>0? ` (${conv.gold} converted)`:""}`;
+
+  // Lower-tier equivalents
+  let equiv = [];
+  if(rem.gold>0) equiv.push(`${rem.gold} Gold → ${rem.gold*3} Purple → ${rem.gold*9} Blue → ${rem.gold*27} Green`);
+  if(rem.purple>0) equiv.push(`${rem.purple} Purple → ${rem.purple*3} Blue → ${rem.purple*9} Green`);
+  if(rem.blue>0) equiv.push(`${rem.blue} Blue → ${rem.blue*3} Green`);
 
   expNeededEl.textContent = `EXP Needed: ${remainingExp}`;
   goldNeededEl.textContent = `Gold Needed: ${totalGold}`;
-  ascNeededEl.textContent = `Ascension Books Needed: Green:${remainingAsc.green} Blue:${remainingAsc.blue} Purple:${remainingAsc.purple} Gold:${remainingAsc.gold}`;
+  ascNeededEl.textContent = `Ascension Books Needed: ${ascText}`;
+  ascEquivalentEl.textContent = `Equivalent in lower-tier books: ${equiv.join(" ; ")}`;
 
-  // Update detailed table
+  // Update table
   tableBodyEl.innerHTML = "";
   levels.forEach(l=>{
     const row = document.createElement("tr");
@@ -236,18 +268,8 @@ function calculate() {
       <td>${l.asc.gold||0}</td>`;
     tableBodyEl.appendChild(row);
   });
-
-  // Add total green & blue equivalents at bottom
-  const totalRow = document.createElement("tr");
-  totalRow.style.fontWeight = "bold";
-  totalRow.innerHTML = `<td>Total</td>
-    <td>${totalExp}</td>
-    <td>${totalGold}</td>
-    <td colspan="4">Green-Equivalent: ${convertToGreen(totalAsc)} | Blue-Equivalent: ${convertToBlue(totalAsc)}</td>`;
-  tableBodyEl.appendChild(totalRow);
 }
 
-// Event listeners
 [startLevelEl,targetLevelEl,greenExpEl,blueExpEl,greenAscEl,blueAscEl,purpleAscEl,goldAscEl].forEach(el=>{
   el.addEventListener("input",calculate);
 });
