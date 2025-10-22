@@ -36,6 +36,17 @@ select, input[type=number] {
   color: #fff;
 }
 select option { background: #1a2a4a; color: #fff; }
+
+/* Remove spinner arrows on number inputs */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
 .results {
   background: rgba(0,0,0,0.6);
   padding: 15px;
@@ -236,7 +247,6 @@ function calculate() {
   // Continuous conversion chain for remaining needs
   let convertedLines = [];
 
-  // Green -> Blue for remaining purple/blue needs
   if(rem.purple>0 && extra.blue>0){
     let useBlue = Math.min(extra.blue, rem.purple*3);
     rem.purple -= Math.floor(useBlue/3);
@@ -250,7 +260,6 @@ function calculate() {
     extra.green -= useGreen;
   }
 
-  // Purple -> Gold
   if(rem.gold>0 && extra.purple>0){
     let usePurple = Math.min(extra.purple, rem.gold*3);
     rem.gold -= Math.floor(usePurple/3);
