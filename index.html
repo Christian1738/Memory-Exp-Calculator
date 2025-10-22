@@ -16,20 +16,21 @@ h1 {
   font-weight: 600;
   font-size: 2rem;
 }
-.container, .flex-panel {
+.flex-panel {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center; /* center panels */
   gap: 30px;
-  padding: 0 60px; /* breathing room from page edges */
+  padding: 20px 60px; /* breathing room from left and right edges */
   box-sizing: border-box;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+  overflow-x: auto; /* allows scrolling instead of stacking */
 }
 .card {
   background: linear-gradient(145deg, rgba(20,30,50,0.95), rgba(0,0,40,0.95));
   padding: 25px;
   border-radius: 15px;
-  flex: 1;
-  min-width: 370px;
+  flex: 0 0 400px; /* fixed width to maintain side-by-side */
   box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 label {
@@ -52,7 +53,6 @@ select option {
   background: #1a2a4a;
   color: #fff;
 }
-/* Remove number spinner */
 input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button {-webkit-appearance: none; margin: 0;}
 input[type=number] { -moz-appearance: textfield; }
@@ -79,27 +79,19 @@ button:hover { background-color: #0077dd; }
   line-height: 1.6;
 }
 
-/* Promotion Manuals color coding */
 .manual-green { color: #00FF00; font-weight: bold; }
 .manual-blue { color: #00BFFF; font-weight: bold; }
 .manual-purple { color: #DA70D6; font-weight: bold; }
 .manual-gold { color: #FFD700; font-weight: bold; }
 
-/* TABLE */
 table { width: 100%; border-collapse: collapse; margin-top: 15px; }
 th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-size: 0.9rem; }
 
-/* SIGNATURE */
 .signature {
   text-align: right;
   margin: 30px 60px 10px 0;
   font-size: 0.85rem;
   opacity: 0.7;
-}
-
-/* RESPONSIVE */
-@media(max-width: 850px) {
-  .flex-panel { flex-direction: column; padding: 0 20px; }
 }
 </style>
 </head>
@@ -108,27 +100,27 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-s
 <h1>UR Memory EXP & Promotion Calculator</h1>
 
 <div class="flex-panel">
-  <!-- LEFT PANEL: RESOURCE INPUT -->
+  <!-- Resources -->
   <div class="card">
     <h2>Your Resources</h2>
-    <label for="greenExp">Green EXP Books:</label>
+    <label>Green EXP Books:</label>
     <input type="number" id="greenExp" placeholder="">
-    <label for="blueExp">Blue EXP Books:</label>
+    <label>Blue EXP Books:</label>
     <input type="number" id="blueExp" placeholder="">
-    <label for="greenManual">Green Promotion Manuals:</label>
+    <label>Green Promotion Manuals:</label>
     <input type="number" id="greenManual" placeholder="">
-    <label for="blueManual">Blue Promotion Manuals:</label>
+    <label>Blue Promotion Manuals:</label>
     <input type="number" id="blueManual" placeholder="">
-    <label for="purpleManual">Purple Promotion Manuals:</label>
+    <label>Purple Promotion Manuals:</label>
     <input type="number" id="purpleManual" placeholder="">
-    <label for="goldManual">Gold Promotion Manuals:</label>
+    <label>Gold Promotion Manuals:</label>
     <input type="number" id="goldManual" placeholder="">
   </div>
 
-  <!-- RIGHT PANEL: LEVEL SELECTION + RESULTS -->
+  <!-- Level & Results -->
   <div class="card">
     <h2>Level Selection & Results</h2>
-    <label for="startLevel">Start Level:</label>
+    <label>Start Level:</label>
     <select id="startLevel">
       <option value="1">1</option>
       <option value="20">20</option>
@@ -136,7 +128,7 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-s
       <option value="60">60</option>
       <option value="70">70</option>
     </select>
-    <label for="targetLevel">Target Level:</label>
+    <label>Target Level:</label>
     <select id="targetLevel">
       <option value="20">20</option>
       <option value="40">40</option>
@@ -156,8 +148,8 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-s
   </div>
 </div>
 
-<!-- DETAILED TABLE -->
-<div class="container">
+<!-- Detailed Table -->
+<div class="flex-panel">
   <div class="card">
     <button id="toggleTableBtn">Show Detailed Table</button>
     <div class="details" id="detailsTable">
@@ -183,10 +175,8 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-s
 <p class="signature">Made by kriscross</p>
 
 <script>
-// EXP values
 const EXP_VALUES = {green:100, blue:1000};
 
-// Level data
 const levels = [
   {range:"1-20", exp:{green:61, blue:0}, gold:12200, manuals:{}},
   {range:"20-40", exp:{green:856, blue:0}, gold:171200, manuals:{green:8, blue:0, purple:0, gold:0}},
@@ -195,7 +185,7 @@ const levels = [
   {range:"70-80", exp:{green:4, blue:392}, gold:784800, manuals:{green:0, blue:0, purple:58, gold:20}}
 ];
 
-// ELEMENTS
+// Elements
 const startLevelEl = document.getElementById("startLevel");
 const targetLevelEl = document.getElementById("targetLevel");
 const greenExpEl = document.getElementById("greenExp");
@@ -212,7 +202,7 @@ const tableBodyEl = document.getElementById("tableBody");
 const detailsTable = document.getElementById("detailsTable");
 const toggleTableBtn = document.getElementById("toggleTableBtn");
 
-// TOGGLE TABLE
+// Toggle detailed table
 toggleTableBtn.addEventListener("click", () => {
   if(detailsTable.style.display === "none" || detailsTable.style.display === ""){
     detailsTable.style.display = "block";
@@ -223,25 +213,23 @@ toggleTableBtn.addEventListener("click", () => {
   }
 });
 
-// COPY RESULTS
+// Copy results
 document.getElementById("copyBtn").addEventListener("click", () => {
   const text = `EXP Needed: ${expNeededEl.textContent}\nGold Needed: ${goldNeededEl.textContent}\n${promotionNeededEl.textContent}\n${manualEquivalentEl.textContent.replace(/<br>/g,"\n")}`;
   navigator.clipboard.writeText(text);
   alert("Results copied to clipboard!");
 });
 
-// CALCULATION FUNCTION
 function calculate() {
   const start = parseInt(startLevelEl.value);
   const target = parseInt(targetLevelEl.value);
 
-  let totalExp = 0, totalGold = 0;
-  let totalManuals = {green:0, blue:0, purple:0, gold:0};
+  let totalExp=0, totalGold=0, totalManuals={green:0,blue:0,purple:0,gold:0};
 
   levels.forEach(l=>{
     const levelStart = parseInt(l.range.split("-")[0]);
     const levelEnd = parseInt(l.range.split("-")[1]);
-    if(start < levelEnd && target > levelStart){
+    if(start<levelEnd && target>levelStart){
       totalExp += l.exp.green*EXP_VALUES.green + l.exp.blue*EXP_VALUES.blue;
       totalGold += l.gold;
       totalManuals.green += l.manuals.green||0;
@@ -251,77 +239,78 @@ function calculate() {
     }
   });
 
-  const userExp = (parseInt(greenExpEl.value)||0)*EXP_VALUES.green + (parseInt(blueExpEl.value)||0)*EXP_VALUES.blue;
-  const remainingExp = Math.max(totalExp - userExp,0);
+  const userExp=(parseInt(greenExpEl.value)||0)*EXP_VALUES.green + (parseInt(blueExpEl.value)||0)*EXP_VALUES.blue;
+  const remainingExp=Math.max(totalExp-userExp,0);
 
-  let userManuals = {
-    green: parseInt(greenManualEl.value)||0,
-    blue: parseInt(blueManualEl.value)||0,
-    purple: parseInt(purpleManualEl.value)||0,
-    gold: parseInt(goldManualEl.value)||0
+  let userManuals={
+    green:parseInt(greenManualEl.value)||0,
+    blue:parseInt(blueManualEl.value)||0,
+    purple:parseInt(purpleManualEl.value)||0,
+    gold:parseInt(goldManualEl.value)||0
   };
 
-  // Remaining needs
-  let rem = {
-    green: Math.max(totalManuals.green - userManuals.green,0),
-    blue: Math.max(totalManuals.blue - userManuals.blue,0),
-    purple: Math.max(totalManuals.purple - userManuals.purple,0),
-    gold: Math.max(totalManuals.gold - userManuals.gold,0)
-  };
+  let rem={...totalManuals};
+  for(let k in rem) rem[k]=Math.max(rem[k]-userManuals[k],0);
 
-  // Extra manuals to convert
-  let extra = {
-    green: Math.max(userManuals.green - totalManuals.green,0),
-    blue: Math.max(userManuals.blue - totalManuals.blue,0),
-    purple: Math.max(userManuals.purple - totalManuals.purple,0)
-  };
+  // Conversion cascading: green→blue→purple→gold
+  let extra={green:Math.max(userManuals.green-totalManuals.green,0),
+             blue:Math.max(userManuals.blue-totalManuals.blue,0),
+             purple:Math.max(userManuals.purple-totalManuals.purple,0)};
 
-  let convertedLines = [];
-
-  if(rem.purple>0 && extra.blue>0){
-    let useBlue = Math.min(extra.blue, rem.purple*3);
-    rem.purple -= Math.floor(useBlue/3);
-    convertedLines.push(`<span class="manual-blue">${useBlue} Blue converted to ${Math.floor(useBlue/3)} Purple</span>`);
-    extra.blue -= useBlue;
+  let convertedLines=[];
+  // Green→Blue
+  if(rem.blue>0 && extra.green>0){
+    let useGreen = Math.min(extra.green, rem.blue*3);
+    rem.blue -= Math.floor(useGreen/3);
+    convertedLines.push(`<span class="manual-green">${useGreen} Green converted to ${Math.floor(useGreen/3)} Blue</span>`);
+    extra.green -= useGreen;
   }
+  // Green→Purple
   if(rem.purple>0 && extra.green>0){
     let useGreen = Math.min(extra.green, rem.purple*9);
     rem.purple -= Math.floor(useGreen/9);
     convertedLines.push(`<span class="manual-green">${useGreen} Green converted to ${Math.floor(useGreen/9)} Purple</span>`);
     extra.green -= useGreen;
   }
-
-  if(rem.gold>0 && extra.purple>0){
-    let usePurple = Math.min(extra.purple, rem.gold*3);
-    rem.gold -= Math.floor(usePurple/3);
-    convertedLines.push(`<span class="manual-purple">${usePurple} Purple converted to ${Math.floor(usePurple/3)} Gold</span>`);
-    extra.purple -= usePurple;
-  }
-  if(rem.gold>0 && extra.blue>0){
-    let useBlue = Math.min(extra.blue, rem.gold*9);
-    rem.gold -= Math.floor(useBlue/9);
-    convertedLines.push(`<span class="manual-blue">${useBlue} Blue converted to ${Math.floor(useBlue/9)} Gold</span>`);
+  // Blue→Purple
+  if(rem.purple>0 && extra.blue>0){
+    let useBlue = Math.min(extra.blue, rem.purple*3);
+    rem.purple -= Math.floor(useBlue/3);
+    convertedLines.push(`<span class="manual-blue">${useBlue} Blue converted to ${Math.floor(useBlue/3)} Purple</span>`);
     extra.blue -= useBlue;
   }
+  // Green→Gold
   if(rem.gold>0 && extra.green>0){
     let useGreen = Math.min(extra.green, rem.gold*27);
     rem.gold -= Math.floor(useGreen/27);
     convertedLines.push(`<span class="manual-green">${useGreen} Green converted to ${Math.floor(useGreen/27)} Gold</span>`);
     extra.green -= useGreen;
   }
+  // Blue→Gold
+  if(rem.gold>0 && extra.blue>0){
+    let useBlue = Math.min(extra.blue, rem.gold*9);
+    rem.gold -= Math.floor(useBlue/9);
+    convertedLines.push(`<span class="manual-blue">${useBlue} Blue converted to ${Math.floor(useBlue/9)} Gold</span>`);
+    extra.blue -= useBlue;
+  }
+  // Purple→Gold
+  if(rem.gold>0 && extra.purple>0){
+    let usePurple = Math.min(extra.purple, rem.gold*3);
+    rem.gold -= Math.floor(usePurple/3);
+    convertedLines.push(`<span class="manual-purple">${usePurple} Purple converted to ${Math.floor(usePurple/3)} Gold</span>`);
+    extra.purple -= usePurple;
+  }
 
-  // Colored output
-  let manualsText = `Green: <span class="manual-green">${rem.green}</span>  Blue: <span class="manual-blue">${rem.blue}</span>  Purple: <span class="manual-purple">${rem.purple}</span>  Gold: <span class="manual-gold">${rem.gold}</span>`;
+  promotionNeededEl.innerHTML = `Promotion Manuals Needed: Green: <span class="manual-green">${rem.green}</span>  Blue: <span class="manual-blue">${rem.blue}</span>  Purple: <span class="manual-purple">${rem.purple}</span>  Gold: <span class="manual-gold">${rem.gold}</span>`;
   manualEquivalentEl.innerHTML = convertedLines.join("<br>");
-  promotionNeededEl.innerHTML = `Promotion Manuals Needed: ${manualsText}`;
   expNeededEl.textContent = `EXP Needed: ${remainingExp}`;
   goldNeededEl.textContent = `Gold Needed: ${totalGold}`;
 
   // Update detailed table
   tableBodyEl.innerHTML = "";
   levels.forEach(l=>{
-    const row = document.createElement("tr");
-    row.innerHTML = `<td>${l.range}</td>
+    const row=document.createElement("tr");
+    row.innerHTML=`<td>${l.range}</td>
       <td>${l.exp.green*EXP_VALUES.green + l.exp.blue*EXP_VALUES.blue}</td>
       <td>${l.gold}</td>
       <td class="manual-green">${l.manuals.green||0}</td>
@@ -332,7 +321,6 @@ function calculate() {
   });
 }
 
-// EVENT LISTENERS
 [startLevelEl,targetLevelEl,greenExpEl,blueExpEl,greenManualEl,blueManualEl,purpleManualEl,goldManualEl].forEach(el=>{
   el.addEventListener("input",calculate);
 });
