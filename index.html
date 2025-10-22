@@ -16,12 +16,13 @@ h1 {
   font-weight: 600;
   font-size: 2rem;
 }
-.container {
+.container, .flex-panel {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
-  margin: 20px;
   gap: 30px;
+  padding: 0 40px; /* side breathing room */
+  box-sizing: border-box;
 }
 .card {
   background: linear-gradient(145deg, rgba(20,30,50,0.95), rgba(0,0,40,0.95));
@@ -95,6 +96,14 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-s
   gap: 30px;
 }
 .flex-panel .card { flex: 1; min-width: 370px; }
+
+/* SIGNATURE */
+.signature {
+  text-align: right;
+  margin: 30px 40px 10px 0;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
 
 /* RESPONSIVE */
 @media(max-width: 850px) {
@@ -178,6 +187,8 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-s
     </div>
   </div>
 </div>
+
+<p class="signature">Made by kriscross</p>
 
 <script>
 // EXP values
