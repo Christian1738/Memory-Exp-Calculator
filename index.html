@@ -18,19 +18,19 @@ h1 {
 }
 .flex-panel {
   display: flex;
+  flex-wrap: wrap; /* allows stacking on small screens */
   gap: 30px;
-  padding: 20px 60px; /* breathing room from left and right edges */
+  padding: 20px 60px;
   box-sizing: border-box;
   justify-content: flex-start;
   align-items: flex-start;
-  flex-wrap: nowrap;
-  overflow-x: auto; /* allows scrolling instead of stacking */
 }
 .card {
   background: linear-gradient(145deg, rgba(20,30,50,0.95), rgba(0,0,40,0.95));
   padding: 25px;
   border-radius: 15px;
-  flex: 0 0 400px; /* fixed width to maintain side-by-side */
+  flex: 1 1 300px; /* responsive width */
+  min-width: 250px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 label {
@@ -172,7 +172,7 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-s
   </div>
 </div>
 
-<p class="signature">Made by kriscross</p>
+<p class="signature">Made by kriscross.</p>
 
 <script>
 const EXP_VALUES = {green:100, blue:1000};
