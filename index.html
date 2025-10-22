@@ -4,28 +4,39 @@
 <meta charset="UTF-8">
 <title>UR Memory EXP & Promotion Calculator</title>
 <style>
+/* GENERAL STYLES */
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0a1c3a, #00102a);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #0a1c3a;
   color: #fff;
 }
-h1 { text-align: center; padding: 20px; }
+h1 {
+  text-align: center;
+  margin: 20px 0;
+  font-weight: 600;
+}
 .container {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
   justify-content: space-around;
   margin: 20px;
+  gap: 20px;
 }
+
+/* CARD STYLING */
 .card {
-  background: rgba(20, 30, 50, 0.85);
+  background: linear-gradient(145deg, rgba(20,30,50,0.9), rgba(0,0,30,0.9));
   padding: 20px;
   border-radius: 12px;
   flex: 1;
-  min-width: 300px;
+  min-width: 320px;
 }
-label { display: block; margin-top: 10px; }
+label {
+  display: block;
+  margin-top: 12px;
+  font-weight: 500;
+}
 select, input[type=number] {
   width: 100%;
   padding: 8px;
@@ -35,24 +46,16 @@ select, input[type=number] {
   background: #1a2a4a;
   color: #fff;
 }
-select option { background: #1a2a4a; color: #fff; }
+select option {
+  background: #1a2a4a;
+  color: #fff;
+}
 
-/* Remove spinner arrows on number inputs */
+/* Remove number spinner */
 input[type=number]::-webkit-outer-spin-button,
-input[type=number]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-input[type=number] {
-    -moz-appearance: textfield;
-}
+input[type=number]::-webkit-inner-spin-button {-webkit-appearance: none; margin: 0;}
+input[type=number] { -moz-appearance: textfield; }
 
-.results {
-  background: rgba(0,0,0,0.6);
-  padding: 15px;
-  margin-top: 20px;
-  border-radius: 10px;
-}
 button {
   margin-top: 10px;
   padding: 10px;
@@ -65,15 +68,13 @@ button {
   cursor: pointer;
 }
 button:hover { background-color: #0077dd; }
-.details {
-  background: rgba(10,20,40,0.8);
+
+.results, .details {
+  background: rgba(0,0,0,0.6);
   padding: 15px;
-  margin-top: 20px;
+  margin-top: 15px;
   border-radius: 10px;
-  display: none;
 }
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
 
 /* Promotion Manuals color coding */
 .manual-green { color: #00FF00; font-weight: bold; }
@@ -81,13 +82,30 @@ th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
 .manual-purple { color: #DA70D6; font-weight: bold; }
 .manual-gold { color: #FFD700; font-weight: bold; }
 
+/* TABLE */
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
+
+/* FLEX BOX FOR INPUTS + RESULTS */
+.flex-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.flex-panel .card { flex: 1; min-width: 350px; }
+
+/* RESPONSIVE */
+@media(max-width: 800px) {
+  .flex-panel { flex-direction: column; }
+}
 </style>
 </head>
 <body>
 
 <h1>UR Memory EXP & Promotion Calculator</h1>
 
-<div class="container">
+<div class="flex-panel">
+  <!-- LEFT PANEL: RESOURCE INPUT -->
   <div class="card">
     <h2>Your Resources</h2>
     <label for="greenExp">Green EXP Books:</label>
@@ -104,8 +122,9 @@ th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
     <input type="number" id="goldManual" placeholder="">
   </div>
 
+  <!-- RIGHT PANEL: LEVEL SELECTION + RESULTS -->
   <div class="card">
-    <h2>Level Selection</h2>
+    <h2>Level Selection & Results</h2>
     <label for="startLevel">Start Level:</label>
     <select id="startLevel">
       <option value="1">1</option>
@@ -124,7 +143,7 @@ th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
     </select>
 
     <div class="results" id="results">
-      <h2>Results</h2>
+      <h3>Results</h3>
       <p id="expNeeded">EXP Needed: 0</p>
       <p id="goldNeeded">Gold Needed: 0</p>
       <p id="promotionNeeded">Promotion Manuals Needed: 0</p>
@@ -134,6 +153,7 @@ th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
   </div>
 </div>
 
+<!-- DETAILED TABLE -->
 <div class="container">
   <div class="card">
     <button id="toggleTableBtn">Show Detailed Table</button>
@@ -170,7 +190,7 @@ const levels = [
   {range:"70-80", exp:{green:4, blue:392}, gold:784800, manuals:{green:0, blue:0, purple:58, gold:20}}
 ];
 
-// Elements
+// ELEMENTS
 const startLevelEl = document.getElementById("startLevel");
 const targetLevelEl = document.getElementById("targetLevel");
 const greenExpEl = document.getElementById("greenExp");
@@ -187,7 +207,7 @@ const tableBodyEl = document.getElementById("tableBody");
 const detailsTable = document.getElementById("detailsTable");
 const toggleTableBtn = document.getElementById("toggleTableBtn");
 
-// Toggle table
+// TOGGLE TABLE
 toggleTableBtn.addEventListener("click", () => {
   if(detailsTable.style.display === "none" || detailsTable.style.display === ""){
     detailsTable.style.display = "block";
@@ -198,14 +218,14 @@ toggleTableBtn.addEventListener("click", () => {
   }
 });
 
-// Copy results
+// COPY RESULTS
 document.getElementById("copyBtn").addEventListener("click", () => {
   const text = `EXP Needed: ${expNeededEl.textContent}\nGold Needed: ${goldNeededEl.textContent}\n${promotionNeededEl.textContent}\n${manualEquivalentEl.textContent.replace(/<br>/g,"\n")}`;
   navigator.clipboard.writeText(text);
   alert("Results copied to clipboard!");
 });
 
-// Calculate function
+// CALCULATION FUNCTION
 function calculate() {
   const start = parseInt(startLevelEl.value);
   const target = parseInt(targetLevelEl.value);
@@ -244,14 +264,13 @@ function calculate() {
     gold: Math.max(totalManuals.gold - userManuals.gold,0)
   };
 
-  // Extra manuals to convert (only remaining ones)
+  // Extra manuals to convert
   let extra = {
     green: Math.max(userManuals.green - totalManuals.green,0),
     blue: Math.max(userManuals.blue - totalManuals.blue,0),
     purple: Math.max(userManuals.purple - totalManuals.purple,0)
   };
 
-  // Continuous conversion chain for remaining needs
   let convertedLines = [];
 
   if(rem.purple>0 && extra.blue>0){
@@ -292,7 +311,7 @@ function calculate() {
   expNeededEl.textContent = `EXP Needed: ${remainingExp}`;
   goldNeededEl.textContent = `Gold Needed: ${totalGold}`;
 
-  // Update table
+  // Update detailed table
   tableBodyEl.innerHTML = "";
   levels.forEach(l=>{
     const row = document.createElement("tr");
@@ -307,7 +326,7 @@ function calculate() {
   });
 }
 
-// Event listeners
+// EVENT LISTENERS
 [startLevelEl,targetLevelEl,greenExpEl,blueExpEl,greenManualEl,blueManualEl,purpleManualEl,goldManualEl].forEach(el=>{
   el.addEventListener("input",calculate);
 });
