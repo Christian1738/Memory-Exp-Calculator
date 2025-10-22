@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>UR Memory EXP & Promotion Calculator</title>
 <style>
-/* GENERAL STYLES */
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -13,67 +12,70 @@ body {
 }
 h1 {
   text-align: center;
-  margin: 20px 0;
+  margin: 30px 0;
   font-weight: 600;
+  font-size: 2rem;
 }
 .container {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
   margin: 20px;
-  gap: 20px;
+  gap: 30px;
 }
-
-/* CARD STYLING */
 .card {
-  background: linear-gradient(145deg, rgba(20,30,50,0.9), rgba(0,0,30,0.9));
-  padding: 20px;
-  border-radius: 12px;
+  background: linear-gradient(145deg, rgba(20,30,50,0.95), rgba(0,0,40,0.95));
+  padding: 25px;
+  border-radius: 15px;
   flex: 1;
-  min-width: 320px;
+  min-width: 350px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 label {
   display: block;
-  margin-top: 12px;
+  margin-top: 15px;
   font-weight: 500;
+  font-size: 0.95rem;
 }
 select, input[type=number] {
   width: 100%;
-  padding: 8px;
-  margin-top: 5px;
-  border-radius: 6px;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: 8px;
   border: none;
   background: #1a2a4a;
   color: #fff;
+  font-size: 0.95rem;
 }
 select option {
   background: #1a2a4a;
   color: #fff;
 }
-
 /* Remove number spinner */
 input[type=number]::-webkit-outer-spin-button,
 input[type=number]::-webkit-inner-spin-button {-webkit-appearance: none; margin: 0;}
 input[type=number] { -moz-appearance: textfield; }
 
 button {
-  margin-top: 10px;
-  padding: 10px;
+  margin-top: 15px;
+  padding: 12px;
   width: 100%;
-  border-radius: 8px;
+  border-radius: 10px;
   border: none;
   background-color: #0055aa;
   color: #fff;
   font-weight: bold;
   cursor: pointer;
+  font-size: 1rem;
 }
 button:hover { background-color: #0077dd; }
 
 .results, .details {
   background: rgba(0,0,0,0.6);
-  padding: 15px;
-  margin-top: 15px;
-  border-radius: 10px;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 12px;
+  line-height: 1.6;
 }
 
 /* Promotion Manuals color coding */
@@ -83,19 +85,19 @@ button:hover { background-color: #0077dd; }
 .manual-gold { color: #FFD700; font-weight: bold; }
 
 /* TABLE */
-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
+table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-size: 0.9rem; }
 
 /* FLEX BOX FOR INPUTS + RESULTS */
 .flex-panel {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 30px;
 }
-.flex-panel .card { flex: 1; min-width: 350px; }
+.flex-panel .card { flex: 1; min-width: 370px; }
 
 /* RESPONSIVE */
-@media(max-width: 800px) {
+@media(max-width: 850px) {
   .flex-panel { flex-direction: column; }
 }
 </style>
@@ -146,7 +148,7 @@ th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
       <h3>Results</h3>
       <p id="expNeeded">EXP Needed: 0</p>
       <p id="goldNeeded">Gold Needed: 0</p>
-      <p id="promotionNeeded">Promotion Manuals Needed: 0</p>
+      <p id="promotionNeeded">Promotion Manuals Needed: </p>
       <p id="manualEquivalent"></p>
       <button id="copyBtn">Copy Results</button>
     </div>
@@ -276,38 +278,39 @@ function calculate() {
   if(rem.purple>0 && extra.blue>0){
     let useBlue = Math.min(extra.blue, rem.purple*3);
     rem.purple -= Math.floor(useBlue/3);
-    convertedLines.push(`${useBlue} Blue converted to ${Math.floor(useBlue/3)} Purple`);
+    convertedLines.push(`<span class="manual-blue">${useBlue} Blue converted to ${Math.floor(useBlue/3)} Purple</span>`);
     extra.blue -= useBlue;
   }
   if(rem.purple>0 && extra.green>0){
     let useGreen = Math.min(extra.green, rem.purple*9);
     rem.purple -= Math.floor(useGreen/9);
-    convertedLines.push(`${useGreen} Green converted to ${Math.floor(useGreen/9)} Purple`);
+    convertedLines.push(`<span class="manual-green">${useGreen} Green converted to ${Math.floor(useGreen/9)} Purple</span>`);
     extra.green -= useGreen;
   }
 
   if(rem.gold>0 && extra.purple>0){
     let usePurple = Math.min(extra.purple, rem.gold*3);
     rem.gold -= Math.floor(usePurple/3);
-    convertedLines.push(`${usePurple} Purple converted to ${Math.floor(usePurple/3)} Gold`);
+    convertedLines.push(`<span class="manual-purple">${usePurple} Purple converted to ${Math.floor(usePurple/3)} Gold</span>`);
     extra.purple -= usePurple;
   }
   if(rem.gold>0 && extra.blue>0){
     let useBlue = Math.min(extra.blue, rem.gold*9);
     rem.gold -= Math.floor(useBlue/9);
-    convertedLines.push(`${useBlue} Blue converted to ${Math.floor(useBlue/9)} Gold`);
+    convertedLines.push(`<span class="manual-blue">${useBlue} Blue converted to ${Math.floor(useBlue/9)} Gold</span>`);
     extra.blue -= useBlue;
   }
   if(rem.gold>0 && extra.green>0){
     let useGreen = Math.min(extra.green, rem.gold*27);
     rem.gold -= Math.floor(useGreen/27);
-    convertedLines.push(`${useGreen} Green converted to ${Math.floor(useGreen/27)} Gold`);
+    convertedLines.push(`<span class="manual-green">${useGreen} Green converted to ${Math.floor(useGreen/27)} Gold</span>`);
     extra.green -= useGreen;
   }
 
-  let manualsText = `Green: ${rem.green}  Blue: ${rem.blue}  Purple: ${rem.purple}  Gold: ${rem.gold}`;
+  // Colored output
+  let manualsText = `Green: <span class="manual-green">${rem.green}</span>  Blue: <span class="manual-blue">${rem.blue}</span>  Purple: <span class="manual-purple">${rem.purple}</span>  Gold: <span class="manual-gold">${rem.gold}</span>`;
   manualEquivalentEl.innerHTML = convertedLines.join("<br>");
-  promotionNeededEl.textContent = `Promotion Manuals Needed: ${manualsText}`;
+  promotionNeededEl.innerHTML = `Promotion Manuals Needed: ${manualsText}`;
   expNeededEl.textContent = `EXP Needed: ${remainingExp}`;
   goldNeededEl.textContent = `Gold Needed: ${totalGold}`;
 
