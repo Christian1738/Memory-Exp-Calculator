@@ -19,9 +19,9 @@ h1 {
 .container, .flex-panel {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-around;
+  justify-content: center; /* center panels */
   gap: 30px;
-  padding: 0 40px; /* side breathing room */
+  padding: 0 60px; /* breathing room from page edges */
   box-sizing: border-box;
 }
 .card {
@@ -29,7 +29,7 @@ h1 {
   padding: 25px;
   border-radius: 15px;
   flex: 1;
-  min-width: 350px;
+  min-width: 370px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 label {
@@ -89,25 +89,17 @@ button:hover { background-color: #0077dd; }
 table { width: 100%; border-collapse: collapse; margin-top: 15px; }
 th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-size: 0.9rem; }
 
-/* FLEX BOX FOR INPUTS + RESULTS */
-.flex-panel {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 30px;
-}
-.flex-panel .card { flex: 1; min-width: 370px; }
-
 /* SIGNATURE */
 .signature {
   text-align: right;
-  margin: 30px 40px 10px 0;
+  margin: 30px 60px 10px 0;
   font-size: 0.85rem;
   opacity: 0.7;
 }
 
 /* RESPONSIVE */
 @media(max-width: 850px) {
-  .flex-panel { flex-direction: column; }
+  .flex-panel { flex-direction: column; padding: 0 20px; }
 }
 </style>
 </head>
