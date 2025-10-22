@@ -1,85 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>UR Memory EXP & Ascension Calculator</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #0a1c3a, #000d1a);
-      color: #ffffff;
-    }
-    h1 {
-      text-align: center;
-      padding: 20px 0;
-      font-size: 2em;
-    }
-    .container {
-      display: flex;
-      justify-content: space-around;
-      flex-wrap: wrap;
-      margin: 20px;
-      gap: 20px;
-    }
-    .card {
-      background: rgba(20, 30, 50, 0.85);
-      padding: 20px;
-      border-radius: 12px;
-      flex: 1;
-      min-width: 280px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    select, input[type=number] {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: none;
-      background: #1a2a4a;
-      color: #ffffff;
-    }
-    select option {
-      background: #1a2a4a;
-      color: #ffffff;
-    }
-    .results {
-      background: rgba(0,0,0,0.6);
-      padding: 15px;
-      margin-top: 20px;
-      border-radius: 10px;
-    }
-    button {
-      margin-top: 10px;
-      padding: 10px;
-      width: 100%;
-      border-radius: 8px;
-      border: none;
-      background-color: #0055aa;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0077dd;
-    }
-    .details {
-      background: rgba(10,20,40,0.8);
-      padding: 15px;
-      margin-top: 20px;
-      border-radius: 10px;
-      display: none;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>UR Memory EXP & Ascension Calculator</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #0a1c3a, #00102a);
+  color: #fff;
+}
+h1 { text-align: center; padding: 20px; }
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-around;
+  margin: 20px;
+}
+.card {
+  background: rgba(20, 30, 50, 0.85);
+  padding: 20px;
+  border-radius: 12px;
+  flex: 1;
+  min-width: 300px;
+}
+label { display: block; margin-top: 10px; }
+select, input[type=number] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: none;
+  background: #1a2a4a;
+  color: #fff;
+}
+select option { background: #1a2a4a; color: #fff; }
+.results {
+  background: rgba(0,0,0,0.6);
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 10px;
+}
+button {
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+  border-radius: 8px;
+  border: none;
+  background-color: #0055aa;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+button:hover { background-color: #0077dd; }
+.details {
+  background: rgba(10,20,40,0.8);
+  padding: 15px;
+  margin-top: 20px;
+  border-radius: 10px;
+  display: none;
+}
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
+</style>
 </head>
 <body>
 
 <h1>UR Memory EXP & Ascension Calculator</h1>
 
 <div class="container">
+  <div class="card">
+    <h2>Your Resources</h2>
+    <label for="greenExp">Green EXP Books:</label>
+    <input type="number" id="greenExp" value="0" min="0">
+    <label for="blueExp">Blue EXP Books:</label>
+    <input type="number" id="blueExp" value="0" min="0">
+    <label for="greenAsc">Green Ascension Books:</label>
+    <input type="number" id="greenAsc" value="0" min="0">
+    <label for="blueAsc">Blue Ascension Books:</label>
+    <input type="number" id="blueAsc" value="0" min="0">
+    <label for="purpleAsc">Purple Ascension Books:</label>
+    <input type="number" id="purpleAsc" value="0" min="0">
+    <label for="goldAsc">Gold Ascension Books:</label>
+    <input type="number" id="goldAsc" value="0" min="0">
+  </div>
+
   <div class="card">
     <h2>Level Selection</h2>
     <label for="startLevel">Start Level:</label>
@@ -90,7 +96,6 @@
       <option value="60">60</option>
       <option value="70">70</option>
     </select>
-
     <label for="targetLevel">Target Level:</label>
     <select id="targetLevel">
       <option value="20">20</option>
@@ -99,37 +104,14 @@
       <option value="70">70</option>
       <option value="80">80</option>
     </select>
-  </div>
 
-  <div class="card">
-    <h2>Your Resources</h2>
-    <label for="greenExp">Green EXP Books:</label>
-    <input type="number" id="greenExp" value="0" min="0">
-
-    <label for="blueExp">Blue EXP Books:</label>
-    <input type="number" id="blueExp" value="0" min="0">
-
-    <label for="greenAsc">Green Ascension Books:</label>
-    <input type="number" id="greenAsc" value="0" min="0">
-
-    <label for="blueAsc">Blue Ascension Books:</label>
-    <input type="number" id="blueAsc" value="0" min="0">
-
-    <label for="purpleAsc">Purple Ascension Books:</label>
-    <input type="number" id="purpleAsc" value="0" min="0">
-
-    <label for="goldAsc">Gold Ascension Books:</label>
-    <input type="number" id="goldAsc" value="0" min="0">
-  </div>
-</div>
-
-<div class="container">
-  <div class="card results" id="results">
-    <h2>Results</h2>
-    <p id="expNeeded">EXP Needed: 0</p>
-    <p id="goldNeeded">Gold Needed: 0</p>
-    <p id="ascNeeded">Ascension Books Needed: 0</p>
-    <button id="copyBtn">Copy Results</button>
+    <div class="results" id="results">
+      <h2>Results</h2>
+      <p id="expNeeded">EXP Needed: 0</p>
+      <p id="goldNeeded">Gold Needed: 0</p>
+      <p id="ascNeeded">Ascension Books Needed: 0</p>
+      <button id="copyBtn">Copy Results</button>
+    </div>
   </div>
 </div>
 
@@ -138,17 +120,16 @@
     <button onclick="toggleDetails()">Show/Hide Detailed Table</button>
     <div class="details" id="detailsTable">
       <h3>Detailed EXP & Ascension Table</h3>
-      <p>All values are automatically calculated based on level ranges and your input resources.</p>
-      <table style="width:100%; border-collapse: collapse;">
+      <table>
         <thead>
-          <tr style="border-bottom: 1px solid #fff;">
+          <tr>
             <th>Level Range</th>
             <th>EXP</th>
             <th>Gold</th>
-            <th>Green Books</th>
-            <th>Blue Books</th>
-            <th>Purple Books</th>
-            <th>Gold Books</th>
+            <th>Green</th>
+            <th>Blue</th>
+            <th>Purple</th>
+            <th>Gold</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -158,14 +139,19 @@
 </div>
 
 <script>
-const expData = {
-  "1-20": {exp: 6100, gold: 12200, green: 61, blue: 0, purple: 0, goldBook: 0},
-  "20-40": {exp: 8560, gold: 171200, green: 856, blue: 12, purple: 0, goldBook: 0},
-  "40-60": {exp: 4100+573, gold: 820000+613400, green: 4100+4, blue: 50+392, purple: 16+58, goldBook: 0},
-  "60-70": {exp: 573, gold: 613400, green: 573, blue: 249, purple: 16, goldBook: 0},
-  "70-80": {exp: 4, gold: 784800, green: 4, blue: 392, purple: 20, goldBook: 0}
-};
+// EXP book values
+const EXP_VALUES = {green:100, blue:1000};
 
+// Level data
+const levels = [
+  {range:"1-20", exp:{green:61, blue:0}, gold:12200, asc:{}},
+  {range:"20-40", exp:{green:856, blue:0}, gold:171200, asc:{green:8, blue:0, purple:0, gold:0}, ascGold:30000},
+  {range:"40-60", exp:{green:4100, blue:0}, gold:820000, asc:{green:40, blue:12, purple:0, gold:0}, ascGold:80000},
+  {range:"60-70", exp:{green:573, blue:249}, gold:613400, asc:{green:0, blue:50, purple:16, gold:0}, ascGold:200000},
+  {range:"70-80", exp:{green:4, blue:392}, gold:784800, asc:{green:0, blue:0, purple:58, gold:20}, ascGold:500000}
+];
+
+// Get elements
 const startLevelEl = document.getElementById("startLevel");
 const targetLevelEl = document.getElementById("targetLevel");
 const greenExpEl = document.getElementById("greenExp");
@@ -174,70 +160,97 @@ const greenAscEl = document.getElementById("greenAsc");
 const blueAscEl = document.getElementById("blueAsc");
 const purpleAscEl = document.getElementById("purpleAsc");
 const goldAscEl = document.getElementById("goldAsc");
-
 const expNeededEl = document.getElementById("expNeeded");
 const goldNeededEl = document.getElementById("goldNeeded");
 const ascNeededEl = document.getElementById("ascNeeded");
 const tableBodyEl = document.getElementById("tableBody");
 
-function calculate() {
-  const start = parseInt(startLevelEl.value);
-  const target = parseInt(targetLevelEl.value);
-  let totalExp = 0;
-  let totalGold = 0;
-
-  // Simplified calculation for this example
-  if(start < target){
-    if(start < 20 && target >=20) totalExp += 6100, totalGold += 12200;
-    if(start < 40 && target >=40) totalExp += 8560, totalGold += 171200;
-    if(start < 60 && target >=60) totalExp += 4100+573, totalGold += 820000+613400;
-    if(start < 70 && target >=70) totalExp += 573, totalGold += 613400;
-    if(start < 80 && target >=80) totalExp += 4, totalGold += 784800;
-  }
-
-  const userGreenExp = parseInt(greenExpEl.value);
-  const userBlueExp = parseInt(blueExpEl.value);
-  const expProvided = userGreenExp*100 + userBlueExp*1000;
-  const remainingExp = Math.max(totalExp - expProvided,0);
-
-  expNeededEl.textContent = "EXP Needed: " + remainingExp;
-  goldNeededEl.textContent = "Gold Needed: " + totalGold;
-
-  // Simplified ascension display (for full breakdown can expand)
-  const userTotalAsc = parseInt(greenAscEl.value) + parseInt(blueAscEl.value) + parseInt(purpleAscEl.value) + parseInt(goldAscEl.value);
-  const remainingAsc = Math.max(0,10 - userTotalAsc); // example
-  ascNeededEl.textContent = "Ascension Books Needed: " + remainingAsc;
-
-  // Table
-  tableBodyEl.innerHTML = `
-    <tr><td>1-20</td><td>${6100}</td><td>${12200}</td><td>61</td><td>0</td><td>0</td><td>0</td></tr>
-    <tr><td>20-40</td><td>${8560}</td><td>${171200}</td><td>856</td><td>12</td><td>0</td><td>0</td></tr>
-    <tr><td>40-60</td><td>${4100+573}</td><td>${820000+613400}</td><td>${4100+4}</td><td>${50+392}</td><td>${16+58}</td><td>0</td></tr>
-    <tr><td>60-70</td><td>573</td><td>613400</td><td>573</td><td>249</td><td>16</td><td>0</td></tr>
-    <tr><td>70-80</td><td>4</td><td>784800</td><td>4</td><td>392</td><td>20</td><td>0</td></tr>
-  `;
-}
-
+// Toggle table
 function toggleDetails() {
   const details = document.getElementById("detailsTable");
   details.style.display = details.style.display === "none" ? "block" : "none";
 }
 
-// Copy to clipboard
+// Copy results
 document.getElementById("copyBtn").addEventListener("click", () => {
   const text = `EXP Needed: ${expNeededEl.textContent}\nGold Needed: ${goldNeededEl.textContent}\n${ascNeededEl.textContent}`;
   navigator.clipboard.writeText(text);
   alert("Results copied to clipboard!");
 });
 
-startLevelEl.addEventListener("change", calculate);
-targetLevelEl.addEventListener("change", calculate);
-greenExpEl.addEventListener("input", calculate);
-blueExpEl.addEventListener("input", calculate);
-greenAscEl.addEventListener("input", calculate);
-blueAscEl.addEventListener("input", calculate);
-purpleAscEl.addEventListener("input", calculate);
-goldAscEl.addEventListener("input", calculate);
+// Helper to convert ascension books
+function convertToGreen(total) {
+  return total.gold*27 + total.purple*9 + total.blue*3 + total.green;
+}
+
+function convertToBlue(total) {
+  return total.gold*9 + total.purple*3 + total.blue + total.green/3;
+}
+
+// Calculation function
+function calculate() {
+  const start = parseInt(startLevelEl.value);
+  const target = parseInt(targetLevelEl.value);
+
+  let totalExp = 0, totalGold = 0;
+  let totalAsc = {green:0, blue:0, purple:0, gold:0};
+
+  levels.forEach(l => {
+    const levelStart = parseInt(l.range.split("-")[0]);
+    const levelEnd = parseInt(l.range.split("-")[1]);
+    if(start < levelEnd && target > levelStart){
+      totalExp += (l.exp.green*EXP_VALUES.green + l.exp.blue*EXP_VALUES.blue);
+      totalGold += l.gold;
+      if(l.asc.green) totalAsc.green += l.asc.green;
+      if(l.asc.blue) totalAsc.blue += l.asc.blue;
+      if(l.asc.purple) totalAsc.purple += l.asc.purple;
+      if(l.asc.gold) totalAsc.gold += l.asc.gold;
+    }
+  });
+
+  // Subtract user resources
+  const userExp = greenExpEl.value*EXP_VALUES.green + blueExpEl.value*EXP_VALUES.blue;
+  const remainingExp = Math.max(totalExp - userExp,0);
+
+  const remainingAsc = {
+    green: Math.max(totalAsc.green - greenAscEl.value,0),
+    blue: Math.max(totalAsc.blue - blueAscEl.value,0),
+    purple: Math.max(totalAsc.purple - purpleAscEl.value,0),
+    gold: Math.max(totalAsc.gold - goldAscEl.value,0)
+  };
+
+  expNeededEl.textContent = `EXP Needed: ${remainingExp}`;
+  goldNeededEl.textContent = `Gold Needed: ${totalGold}`;
+  ascNeededEl.textContent = `Ascension Books Needed: Green:${remainingAsc.green} Blue:${remainingAsc.blue} Purple:${remainingAsc.purple} Gold:${remainingAsc.gold}`;
+
+  // Update detailed table
+  tableBodyEl.innerHTML = "";
+  levels.forEach(l=>{
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${l.range}</td>
+      <td>${l.exp.green*EXP_VALUES.green + l.exp.blue*EXP_VALUES.blue}</td>
+      <td>${l.gold}</td>
+      <td>${l.asc.green||0}</td>
+      <td>${l.asc.blue||0}</td>
+      <td>${l.asc.purple||0}</td>
+      <td>${l.asc.gold||0}</td>`;
+    tableBodyEl.appendChild(row);
+  });
+
+  // Add total green & blue equivalents at bottom
+  const totalRow = document.createElement("tr");
+  totalRow.style.fontWeight = "bold";
+  totalRow.innerHTML = `<td>Total</td>
+    <td>${totalExp}</td>
+    <td>${totalGold}</td>
+    <td colspan="4">Green-Equivalent: ${convertToGreen(totalAsc)} | Blue-Equivalent: ${convertToBlue(totalAsc)}</td>`;
+  tableBodyEl.appendChild(totalRow);
+}
+
+// Event listeners
+[startLevelEl,targetLevelEl,greenExpEl,blueExpEl,greenAscEl,blueAscEl,purpleAscEl,goldAscEl].forEach(el=>{
+  el.addEventListener("input",calculate);
+});
 
 calculate();
 </script>
