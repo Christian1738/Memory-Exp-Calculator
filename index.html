@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>UR Memory EXP & Ascension Calculator</title>
+<title>UR Memory EXP & Promotion Calculator</title>
 <style>
 body {
   margin: 0;
@@ -74,11 +74,18 @@ button:hover { background-color: #0077dd; }
 }
 table { width: 100%; border-collapse: collapse; margin-top: 10px; }
 th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
+
+/* Promotion Manuals color coding */
+.manual-green { color: #00FF00; font-weight: bold; }
+.manual-blue { color: #00BFFF; font-weight: bold; }
+.manual-purple { color: #DA70D6; font-weight: bold; }
+.manual-gold { color: #FFD700; font-weight: bold; }
+
 </style>
 </head>
 <body>
 
-<h1>UR Memory EXP & Ascension Calculator</h1>
+<h1>UR Memory EXP & Promotion Calculator</h1>
 
 <div class="container">
   <div class="card">
@@ -87,14 +94,14 @@ th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
     <input type="number" id="greenExp" placeholder="">
     <label for="blueExp">Blue EXP Books:</label>
     <input type="number" id="blueExp" placeholder="">
-    <label for="greenAsc">Green Ascension Books:</label>
-    <input type="number" id="greenAsc" placeholder="">
-    <label for="blueAsc">Blue Ascension Books:</label>
-    <input type="number" id="blueAsc" placeholder="">
-    <label for="purpleAsc">Purple Ascension Books:</label>
-    <input type="number" id="purpleAsc" placeholder="">
-    <label for="goldAsc">Gold Ascension Books:</label>
-    <input type="number" id="goldAsc" placeholder="">
+    <label for="greenManual">Green Promotion Manuals:</label>
+    <input type="number" id="greenManual" placeholder="">
+    <label for="blueManual">Blue Promotion Manuals:</label>
+    <input type="number" id="blueManual" placeholder="">
+    <label for="purpleManual">Purple Promotion Manuals:</label>
+    <input type="number" id="purpleManual" placeholder="">
+    <label for="goldManual">Gold Promotion Manuals:</label>
+    <input type="number" id="goldManual" placeholder="">
   </div>
 
   <div class="card">
@@ -120,8 +127,8 @@ th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
       <h2>Results</h2>
       <p id="expNeeded">EXP Needed: 0</p>
       <p id="goldNeeded">Gold Needed: 0</p>
-      <p id="ascNeeded">Ascension Books Needed: 0</p>
-      <p id="ascEquivalent"></p>
+      <p id="promotionNeeded">Promotion Manuals Needed: 0</p>
+      <p id="manualEquivalent"></p>
       <button id="copyBtn">Copy Results</button>
     </div>
   </div>
@@ -131,17 +138,17 @@ th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
   <div class="card">
     <button id="toggleTableBtn">Show Detailed Table</button>
     <div class="details" id="detailsTable">
-      <h3>Detailed EXP & Ascension Table</h3>
+      <h3>Detailed EXP & Promotion Table</h3>
       <table>
         <thead>
           <tr>
             <th>Level Range</th>
             <th>EXP</th>
             <th>Gold</th>
-            <th>Green</th>
-            <th>Blue</th>
-            <th>Purple</th>
-            <th>Gold</th>
+            <th class="manual-green">Green</th>
+            <th class="manual-blue">Blue</th>
+            <th class="manual-purple">Purple</th>
+            <th class="manual-gold">Gold</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -156,11 +163,11 @@ const EXP_VALUES = {green:100, blue:1000};
 
 // Level data
 const levels = [
-  {range:"1-20", exp:{green:61, blue:0}, gold:12200, asc:{}},
-  {range:"20-40", exp:{green:856, blue:0}, gold:171200, asc:{green:8, blue:0, purple:0, gold:0}},
-  {range:"40-60", exp:{green:4100, blue:0}, gold:820000, asc:{green:40, blue:12, purple:0, gold:0}},
-  {range:"60-70", exp:{green:573, blue:249}, gold:613400, asc:{green:0, blue:50, purple:16, gold:0}},
-  {range:"70-80", exp:{green:4, blue:392}, gold:784800, asc:{green:0, blue:0, purple:58, gold:20}}
+  {range:"1-20", exp:{green:61, blue:0}, gold:12200, manuals:{}},
+  {range:"20-40", exp:{green:856, blue:0}, gold:171200, manuals:{green:8, blue:0, purple:0, gold:0}},
+  {range:"40-60", exp:{green:4100, blue:0}, gold:820000, manuals:{green:40, blue:12, purple:0, gold:0}},
+  {range:"60-70", exp:{green:573, blue:249}, gold:613400, manuals:{green:0, blue:50, purple:16, gold:0}},
+  {range:"70-80", exp:{green:4, blue:392}, gold:784800, manuals:{green:0, blue:0, purple:58, gold:20}}
 ];
 
 // Elements
@@ -168,14 +175,14 @@ const startLevelEl = document.getElementById("startLevel");
 const targetLevelEl = document.getElementById("targetLevel");
 const greenExpEl = document.getElementById("greenExp");
 const blueExpEl = document.getElementById("blueExp");
-const greenAscEl = document.getElementById("greenAsc");
-const blueAscEl = document.getElementById("blueAsc");
-const purpleAscEl = document.getElementById("purpleAsc");
-const goldAscEl = document.getElementById("goldAsc");
+const greenManualEl = document.getElementById("greenManual");
+const blueManualEl = document.getElementById("blueManual");
+const purpleManualEl = document.getElementById("purpleManual");
+const goldManualEl = document.getElementById("goldManual");
 const expNeededEl = document.getElementById("expNeeded");
 const goldNeededEl = document.getElementById("goldNeeded");
-const ascNeededEl = document.getElementById("ascNeeded");
-const ascEquivalentEl = document.getElementById("ascEquivalent");
+const promotionNeededEl = document.getElementById("promotionNeeded");
+const manualEquivalentEl = document.getElementById("manualEquivalent");
 const tableBodyEl = document.getElementById("tableBody");
 const detailsTable = document.getElementById("detailsTable");
 const toggleTableBtn = document.getElementById("toggleTableBtn");
@@ -193,7 +200,7 @@ toggleTableBtn.addEventListener("click", () => {
 
 // Copy results
 document.getElementById("copyBtn").addEventListener("click", () => {
-  const text = `EXP Needed: ${expNeededEl.textContent}\nGold Needed: ${goldNeededEl.textContent}\n${ascNeededEl.textContent}\n${ascEquivalentEl.textContent.replace(/<br>/g,"\n")}`;
+  const text = `EXP Needed: ${expNeededEl.textContent}\nGold Needed: ${goldNeededEl.textContent}\n${promotionNeededEl.textContent}\n${manualEquivalentEl.textContent.replace(/<br>/g,"\n")}`;
   navigator.clipboard.writeText(text);
   alert("Results copied to clipboard!");
 });
@@ -204,7 +211,7 @@ function calculate() {
   const target = parseInt(targetLevelEl.value);
 
   let totalExp = 0, totalGold = 0;
-  let totalAsc = {green:0, blue:0, purple:0, gold:0};
+  let totalManuals = {green:0, blue:0, purple:0, gold:0};
 
   levels.forEach(l=>{
     const levelStart = parseInt(l.range.split("-")[0]);
@@ -212,36 +219,36 @@ function calculate() {
     if(start < levelEnd && target > levelStart){
       totalExp += l.exp.green*EXP_VALUES.green + l.exp.blue*EXP_VALUES.blue;
       totalGold += l.gold;
-      totalAsc.green += l.asc.green||0;
-      totalAsc.blue += l.asc.blue||0;
-      totalAsc.purple += l.asc.purple||0;
-      totalAsc.gold += l.asc.gold||0;
+      totalManuals.green += l.manuals.green||0;
+      totalManuals.blue += l.manuals.blue||0;
+      totalManuals.purple += l.manuals.purple||0;
+      totalManuals.gold += l.manuals.gold||0;
     }
   });
 
   const userExp = (parseInt(greenExpEl.value)||0)*EXP_VALUES.green + (parseInt(blueExpEl.value)||0)*EXP_VALUES.blue;
   const remainingExp = Math.max(totalExp - userExp,0);
 
-  let userAsc = {
-    green: parseInt(greenAscEl.value)||0,
-    blue: parseInt(blueAscEl.value)||0,
-    purple: parseInt(purpleAscEl.value)||0,
-    gold: parseInt(goldAscEl.value)||0
+  let userManuals = {
+    green: parseInt(greenManualEl.value)||0,
+    blue: parseInt(blueManualEl.value)||0,
+    purple: parseInt(purpleManualEl.value)||0,
+    gold: parseInt(goldManualEl.value)||0
   };
 
   // Remaining needs
   let rem = {
-    green: Math.max(totalAsc.green - userAsc.green,0),
-    blue: Math.max(totalAsc.blue - userAsc.blue,0),
-    purple: Math.max(totalAsc.purple - userAsc.purple,0),
-    gold: Math.max(totalAsc.gold - userAsc.gold,0)
+    green: Math.max(totalManuals.green - userManuals.green,0),
+    blue: Math.max(totalManuals.blue - userManuals.blue,0),
+    purple: Math.max(totalManuals.purple - userManuals.purple,0),
+    gold: Math.max(totalManuals.gold - userManuals.gold,0)
   };
 
-  // Extra books to convert (only remaining ones)
+  // Extra manuals to convert (only remaining ones)
   let extra = {
-    green: Math.max(userAsc.green - totalAsc.green,0),
-    blue: Math.max(userAsc.blue - totalAsc.blue,0),
-    purple: Math.max(userAsc.purple - totalAsc.purple,0)
+    green: Math.max(userManuals.green - totalManuals.green,0),
+    blue: Math.max(userManuals.blue - totalManuals.blue,0),
+    purple: Math.max(userManuals.purple - totalManuals.purple,0)
   };
 
   // Continuous conversion chain for remaining needs
@@ -279,9 +286,9 @@ function calculate() {
     extra.green -= useGreen;
   }
 
-  let ascText = `Green: ${rem.green}  Blue: ${rem.blue}  Purple: ${rem.purple}  Gold: ${rem.gold}`;
-  ascEquivalentEl.innerHTML = convertedLines.join("<br>");
-  ascNeededEl.textContent = `Ascension Books Needed: ${ascText}`;
+  let manualsText = `Green: ${rem.green}  Blue: ${rem.blue}  Purple: ${rem.purple}  Gold: ${rem.gold}`;
+  manualEquivalentEl.innerHTML = convertedLines.join("<br>");
+  promotionNeededEl.textContent = `Promotion Manuals Needed: ${manualsText}`;
   expNeededEl.textContent = `EXP Needed: ${remainingExp}`;
   goldNeededEl.textContent = `Gold Needed: ${totalGold}`;
 
@@ -292,16 +299,16 @@ function calculate() {
     row.innerHTML = `<td>${l.range}</td>
       <td>${l.exp.green*EXP_VALUES.green + l.exp.blue*EXP_VALUES.blue}</td>
       <td>${l.gold}</td>
-      <td>${l.asc.green||0}</td>
-      <td>${l.asc.blue||0}</td>
-      <td>${l.asc.purple||0}</td>
-      <td>${l.asc.gold||0}</td>`;
+      <td class="manual-green">${l.manuals.green||0}</td>
+      <td class="manual-blue">${l.manuals.blue||0}</td>
+      <td class="manual-purple">${l.manuals.purple||0}</td>
+      <td class="manual-gold">${l.manuals.gold||0}</td>`;
     tableBodyEl.appendChild(row);
   });
 }
 
 // Event listeners
-[startLevelEl,targetLevelEl,greenExpEl,blueExpEl,greenAscEl,blueAscEl,purpleAscEl,goldAscEl].forEach(el=>{
+[startLevelEl,targetLevelEl,greenExpEl,blueExpEl,greenManualEl,blueManualEl,purpleManualEl,goldManualEl].forEach(el=>{
   el.addEventListener("input",calculate);
 });
 
