@@ -73,17 +73,17 @@ th, td { padding: 6px; text-align: center; border-bottom: 1px solid #fff; }
   <div class="card">
     <h2>Your Resources</h2>
     <label for="greenExp">Green EXP Books:</label>
-    <input type="number" id="greenExp" value="0" min="0">
+    <input type="number" id="greenExp" placeholder="">
     <label for="blueExp">Blue EXP Books:</label>
-    <input type="number" id="blueExp" value="0" min="0">
+    <input type="number" id="blueExp" placeholder="">
     <label for="greenAsc">Green Ascension Books:</label>
-    <input type="number" id="greenAsc" value="0" min="0">
+    <input type="number" id="greenAsc" placeholder="">
     <label for="blueAsc">Blue Ascension Books:</label>
-    <input type="number" id="blueAsc" value="0" min="0">
+    <input type="number" id="blueAsc" placeholder="">
     <label for="purpleAsc">Purple Ascension Books:</label>
-    <input type="number" id="purpleAsc" value="0" min="0">
+    <input type="number" id="purpleAsc" placeholder="">
     <label for="goldAsc">Gold Ascension Books:</label>
-    <input type="number" id="goldAsc" value="0" min="0">
+    <input type="number" id="goldAsc" placeholder="">
   </div>
 
   <div class="card">
@@ -208,14 +208,14 @@ function calculate() {
     }
   });
 
-  const userExp = greenExpEl.value*EXP_VALUES.green + blueExpEl.value*EXP_VALUES.blue;
+  const userExp = (parseInt(greenExpEl.value)||0)*EXP_VALUES.green + (parseInt(blueExpEl.value)||0)*EXP_VALUES.blue;
   const remainingExp = Math.max(totalExp - userExp,0);
 
   let userAsc = {
-    green: parseInt(greenAscEl.value),
-    blue: parseInt(blueAscEl.value),
-    purple: parseInt(purpleAscEl.value),
-    gold: parseInt(goldAscEl.value)
+    green: parseInt(greenAscEl.value)||0,
+    blue: parseInt(blueAscEl.value)||0,
+    purple: parseInt(purpleAscEl.value)||0,
+    gold: parseInt(goldAscEl.value)||0
   };
 
   // Remaining needs
@@ -226,44 +226,53 @@ function calculate() {
     gold: Math.max(totalAsc.gold - userAsc.gold,0)
   };
 
-  // Extra books to convert
+  // Extra books to convert (only remaining ones)
   let extra = {
     green: Math.max(userAsc.green - totalAsc.green,0),
     blue: Math.max(userAsc.blue - totalAsc.blue,0),
     purple: Math.max(userAsc.purple - totalAsc.purple,0)
   };
 
-  // Continuous conversion chain
-  // Green -> Blue
-  if(extra.green>0){ 
-    let c = Math.floor(extra.green/3);
-    extra.green %=3;
-    extra.blue += c;
+  // Continuous conversion chain for remaining needs
+  let convertedLines = [];
+
+  // Green -> Blue for remaining purple/blue needs
+  if(rem.purple>0 && extra.blue>0){
+    let useBlue = Math.min(extra.blue, rem.purple*3);
+    rem.purple -= Math.floor(useBlue/3);
+    convertedLines.push(`${useBlue} Blue converted to ${Math.floor(useBlue/3)} Purple`);
+    extra.blue -= useBlue;
   }
-  // Blue -> Purple
-  if(extra.blue>0){ 
-    let c = Math.floor(extra.blue/3);
-    extra.blue %=3;
-    extra.purple += c;
+  if(rem.purple>0 && extra.green>0){
+    let useGreen = Math.min(extra.green, rem.purple*9);
+    rem.purple -= Math.floor(useGreen/9);
+    convertedLines.push(`${useGreen} Green converted to ${Math.floor(useGreen/9)} Purple`);
+    extra.green -= useGreen;
   }
+
   // Purple -> Gold
-  if(extra.purple>0){ 
-    let c = Math.floor(extra.purple/3);
-    extra.purple %=3;
-    extra.gold += c;
+  if(rem.gold>0 && extra.purple>0){
+    let usePurple = Math.min(extra.purple, rem.gold*3);
+    rem.gold -= Math.floor(usePurple/3);
+    convertedLines.push(`${usePurple} Purple converted to ${Math.floor(usePurple/3)} Gold`);
+    extra.purple -= usePurple;
+  }
+  if(rem.gold>0 && extra.blue>0){
+    let useBlue = Math.min(extra.blue, rem.gold*9);
+    rem.gold -= Math.floor(useBlue/9);
+    convertedLines.push(`${useBlue} Blue converted to ${Math.floor(useBlue/9)} Gold`);
+    extra.blue -= useBlue;
+  }
+  if(rem.gold>0 && extra.green>0){
+    let useGreen = Math.min(extra.green, rem.gold*27);
+    rem.gold -= Math.floor(useGreen/27);
+    convertedLines.push(`${useGreen} Green converted to ${Math.floor(useGreen/27)} Gold`);
+    extra.green -= useGreen;
   }
 
-  // Build display text for remaining needs
   let ascText = `Green: ${rem.green}  Blue: ${rem.blue}  Purple: ${rem.purple}  Gold: ${rem.gold}`;
-
-  // Build equivalent lines stacked
-  let equivLines = [];
-  if(rem.gold>0) equivLines.push(`${rem.gold} Gold → ${rem.gold*3} Purple → ${rem.gold*9} Blue → ${rem.gold*27} Green`);
-  if(rem.purple>0) equivLines.push(`${rem.purple} Purple → ${rem.purple*3} Blue → ${rem.purple*9} Green`);
-  if(rem.blue>0) equivLines.push(`${rem.blue} Blue → ${rem.blue*3} Green`);
-
+  ascEquivalentEl.innerHTML = convertedLines.join("<br>");
   ascNeededEl.textContent = `Ascension Books Needed: ${ascText}`;
-  ascEquivalentEl.innerHTML = equivLines.join("<br>");
   expNeededEl.textContent = `EXP Needed: ${remainingExp}`;
   goldNeededEl.textContent = `Gold Needed: ${totalGold}`;
 
