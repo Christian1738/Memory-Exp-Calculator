@@ -182,7 +182,7 @@ toggleTableBtn.addEventListener("click", () => {
 
 // Copy results
 document.getElementById("copyBtn").addEventListener("click", () => {
-  const text = `EXP Needed: ${expNeededEl.textContent}\nGold Needed: ${goldNeededEl.textContent}\n${ascNeededEl.textContent}\n${ascEquivalentEl.textContent}`;
+  const text = `EXP Needed: ${expNeededEl.textContent}\nGold Needed: ${goldNeededEl.textContent}\n${ascNeededEl.textContent}\n${ascEquivalentEl.textContent.replace(/<br>/g,"\n")}`;
   navigator.clipboard.writeText(text);
   alert("Results copied to clipboard!");
 });
@@ -201,10 +201,10 @@ function calculate() {
     if(start < levelEnd && target > levelStart){
       totalExp += l.exp.green*EXP_VALUES.green + l.exp.blue*EXP_VALUES.blue;
       totalGold += l.gold;
-      if(l.asc.green) totalAsc.green += l.asc.green;
-      if(l.asc.blue) totalAsc.blue += l.asc.blue;
-      if(l.asc.purple) totalAsc.purple += l.asc.purple;
-      if(l.asc.gold) totalAsc.gold += l.asc.gold;
+      totalAsc.green += l.asc.green||0;
+      totalAsc.blue += l.asc.blue||0;
+      totalAsc.purple += l.asc.purple||0;
+      totalAsc.gold += l.asc.gold||0;
     }
   });
 
@@ -218,7 +218,7 @@ function calculate() {
     gold: parseInt(goldAscEl.value)
   };
 
-  // Remaining asc after user input
+  // Remaining needs
   let rem = {
     green: Math.max(totalAsc.green - userAsc.green,0),
     blue: Math.max(totalAsc.blue - userAsc.blue,0),
@@ -226,34 +226,46 @@ function calculate() {
     gold: Math.max(totalAsc.gold - userAsc.gold,0)
   };
 
-  // Auto-convert lower-tier books
+  // Extra books to convert
   let extra = {
     green: Math.max(userAsc.green - totalAsc.green,0),
     blue: Math.max(userAsc.blue - totalAsc.blue,0),
     purple: Math.max(userAsc.purple - totalAsc.purple,0)
   };
 
-  let conv = {blue:0, purple:0, gold:0};
-
+  // Continuous conversion chain
   // Green -> Blue
-  if(extra.green>0){ conv.blue = Math.floor(extra.green/3); extra.green %=3;}
+  if(extra.green>0){ 
+    let c = Math.floor(extra.green/3);
+    extra.green %=3;
+    extra.blue += c;
+  }
   // Blue -> Purple
-  if(extra.blue + conv.blue >0){ conv.purple = Math.floor((extra.blue + conv.blue)/3); conv.blue = (extra.blue + conv.blue)%3;}
+  if(extra.blue>0){ 
+    let c = Math.floor(extra.blue/3);
+    extra.blue %=3;
+    extra.purple += c;
+  }
   // Purple -> Gold
-  if(extra.purple + conv.purple >0){ conv.gold = Math.floor((extra.purple + conv.purple)/3); conv.purple = (extra.purple + conv.purple)%3;}
+  if(extra.purple>0){ 
+    let c = Math.floor(extra.purple/3);
+    extra.purple %=3;
+    extra.gold += c;
+  }
 
-  let ascText = `Green:${rem.green} Blue:${rem.blue}${conv.blue>0? ` (${conv.blue} converted)`:""} Purple:${rem.purple}${conv.purple>0? ` (${conv.purple} converted)`:""} Gold:${rem.gold}${conv.gold>0? ` (${conv.gold} converted)`:""}`;
+  // Build display text for remaining needs
+  let ascText = `Green: ${rem.green}  Blue: ${rem.blue}  Purple: ${rem.purple}  Gold: ${rem.gold}`;
 
-  // Lower-tier equivalents
-  let equiv = [];
-  if(rem.gold>0) equiv.push(`${rem.gold} Gold → ${rem.gold*3} Purple → ${rem.gold*9} Blue → ${rem.gold*27} Green`);
-  if(rem.purple>0) equiv.push(`${rem.purple} Purple → ${rem.purple*3} Blue → ${rem.purple*9} Green`);
-  if(rem.blue>0) equiv.push(`${rem.blue} Blue → ${rem.blue*3} Green`);
+  // Build equivalent lines stacked
+  let equivLines = [];
+  if(rem.gold>0) equivLines.push(`${rem.gold} Gold → ${rem.gold*3} Purple → ${rem.gold*9} Blue → ${rem.gold*27} Green`);
+  if(rem.purple>0) equivLines.push(`${rem.purple} Purple → ${rem.purple*3} Blue → ${rem.purple*9} Green`);
+  if(rem.blue>0) equivLines.push(`${rem.blue} Blue → ${rem.blue*3} Green`);
 
+  ascNeededEl.textContent = `Ascension Books Needed: ${ascText}`;
+  ascEquivalentEl.innerHTML = equivLines.join("<br>");
   expNeededEl.textContent = `EXP Needed: ${remainingExp}`;
   goldNeededEl.textContent = `Gold Needed: ${totalGold}`;
-  ascNeededEl.textContent = `Ascension Books Needed: ${ascText}`;
-  ascEquivalentEl.textContent = `Equivalent in lower-tier books: ${equiv.join(" ; ")}`;
 
   // Update table
   tableBodyEl.innerHTML = "";
@@ -270,6 +282,7 @@ function calculate() {
   });
 }
 
+// Event listeners
 [startLevelEl,targetLevelEl,greenExpEl,blueExpEl,greenAscEl,blueAscEl,purpleAscEl,goldAscEl].forEach(el=>{
   el.addEventListener("input",calculate);
 });
