@@ -18,7 +18,7 @@ h1 {
 }
 .flex-panel {
   display: flex;
-  flex-wrap: wrap; /* allows stacking on small screens */
+  flex-wrap: wrap;
   gap: 30px;
   padding: 20px 60px;
   box-sizing: border-box;
@@ -29,7 +29,7 @@ h1 {
   background: linear-gradient(145deg, rgba(20,30,50,0.95), rgba(0,0,40,0.95));
   padding: 25px;
   border-radius: 15px;
-  flex: 1 1 300px; /* responsive width */
+  flex: 1 1 300px;
   min-width: 250px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
@@ -77,6 +77,10 @@ button:hover { background-color: #0077dd; }
   margin-top: 20px;
   border-radius: 12px;
   line-height: 1.6;
+}
+
+.details {
+  display: none; /* hide table initially */
 }
 
 .manual-green { color: #00FF00; font-weight: bold; }
@@ -177,11 +181,12 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-s
 <script>
 const EXP_VALUES = {green:100, blue:1000};
 
+// Adjust EXP for 60-70 (-800)
 const levels = [
   {range:"1-20", exp:{green:61, blue:0}, gold:12200, manuals:{}},
   {range:"20-40", exp:{green:856, blue:0}, gold:171200, manuals:{green:8, blue:0, purple:0, gold:0}},
   {range:"40-60", exp:{green:4100, blue:0}, gold:820000, manuals:{green:40, blue:12, purple:0, gold:0}},
-  {range:"60-70", exp:{green:573, blue:249}, gold:613400, manuals:{green:0, blue:50, purple:16, gold:0}},
+  {range:"60-70", exp:{green:573, blue:249}, gold:613400, manuals:{green:0, blue:50, purple:16, gold:0}, adjust:-800},
   {range:"70-80", exp:{green:4, blue:392}, gold:784800, manuals:{green:0, blue:0, purple:58, gold:20}}
 ];
 
@@ -230,7 +235,10 @@ function calculate() {
     const levelStart = parseInt(l.range.split("-")[0]);
     const levelEnd = parseInt(l.range.split("-")[1]);
     if(start<levelEnd && target>levelStart){
-      totalExp += l.exp.green*EXP_VALUES.green + l.exp.blue*EXP_VALUES.blue;
+      let expGreen = l.exp.green*EXP_VALUES.green;
+      let expBlue = l.exp.blue*EXP_VALUES.blue;
+      if(l.adjust) expGreen = Math.max(expGreen - l.adjust,0); // adjust 60-70
+      totalExp += expGreen + expBlue;
       totalGold += l.gold;
       totalManuals.green += l.manuals.green||0;
       totalManuals.blue += l.manuals.blue||0;
@@ -252,52 +260,46 @@ function calculate() {
   let rem={...totalManuals};
   for(let k in rem) rem[k]=Math.max(rem[k]-userManuals[k],0);
 
-  // Conversion cascading: green→blue→purple→gold
+  // Conversion cascading
   let extra={green:Math.max(userManuals.green-totalManuals.green,0),
              blue:Math.max(userManuals.blue-totalManuals.blue,0),
              purple:Math.max(userManuals.purple-totalManuals.purple,0)};
 
   let convertedLines=[];
-  // Green→Blue
   if(rem.blue>0 && extra.green>0){
     let useGreen = Math.min(extra.green, rem.blue*3);
     rem.blue -= Math.floor(useGreen/3);
-    convertedLines.push(`<span class="manual-green">${useGreen} Green converted to ${Math.floor(useGreen/3)} Blue</span>`);
+    convertedLines.push(`<span class="manual-green">${useGreen} Green → ${Math.floor(useGreen/3)} Blue</span>`);
     extra.green -= useGreen;
   }
-  // Green→Purple
   if(rem.purple>0 && extra.green>0){
     let useGreen = Math.min(extra.green, rem.purple*9);
     rem.purple -= Math.floor(useGreen/9);
-    convertedLines.push(`<span class="manual-green">${useGreen} Green converted to ${Math.floor(useGreen/9)} Purple</span>`);
+    convertedLines.push(`<span class="manual-green">${useGreen} Green → ${Math.floor(useGreen/9)} Purple</span>`);
     extra.green -= useGreen;
   }
-  // Blue→Purple
   if(rem.purple>0 && extra.blue>0){
     let useBlue = Math.min(extra.blue, rem.purple*3);
     rem.purple -= Math.floor(useBlue/3);
-    convertedLines.push(`<span class="manual-blue">${useBlue} Blue converted to ${Math.floor(useBlue/3)} Purple</span>`);
+    convertedLines.push(`<span class="manual-blue">${useBlue} Blue → ${Math.floor(useBlue/3)} Purple</span>`);
     extra.blue -= useBlue;
   }
-  // Green→Gold
   if(rem.gold>0 && extra.green>0){
     let useGreen = Math.min(extra.green, rem.gold*27);
     rem.gold -= Math.floor(useGreen/27);
-    convertedLines.push(`<span class="manual-green">${useGreen} Green converted to ${Math.floor(useGreen/27)} Gold</span>`);
+    convertedLines.push(`<span class="manual-green">${useGreen} Green → ${Math.floor(useGreen/27)} Gold</span>`);
     extra.green -= useGreen;
   }
-  // Blue→Gold
   if(rem.gold>0 && extra.blue>0){
     let useBlue = Math.min(extra.blue, rem.gold*9);
     rem.gold -= Math.floor(useBlue/9);
-    convertedLines.push(`<span class="manual-blue">${useBlue} Blue converted to ${Math.floor(useBlue/9)} Gold</span>`);
+    convertedLines.push(`<span class="manual-blue">${useBlue} Blue → ${Math.floor(useBlue/9)} Gold</span>`);
     extra.blue -= useBlue;
   }
-  // Purple→Gold
   if(rem.gold>0 && extra.purple>0){
     let usePurple = Math.min(extra.purple, rem.gold*3);
     rem.gold -= Math.floor(usePurple/3);
-    convertedLines.push(`<span class="manual-purple">${usePurple} Purple converted to ${Math.floor(usePurple/3)} Gold</span>`);
+    convertedLines.push(`<span class="manual-purple">${usePurple} Purple → ${Math.floor(usePurple/3)} Gold</span>`);
     extra.purple -= usePurple;
   }
 
@@ -309,9 +311,12 @@ function calculate() {
   // Update detailed table
   tableBodyEl.innerHTML = "";
   levels.forEach(l=>{
+    let expGreen = l.exp.green*EXP_VALUES.green;
+    let expBlue = l.exp.blue*EXP_VALUES.blue;
+    if(l.adjust) expGreen = Math.max(expGreen - l.adjust,0);
     const row=document.createElement("tr");
     row.innerHTML=`<td>${l.range}</td>
-      <td>${l.exp.green*EXP_VALUES.green + l.exp.blue*EXP_VALUES.blue}</td>
+      <td>${expGreen + expBlue}</td>
       <td>${l.gold}</td>
       <td class="manual-green">${l.manuals.green||0}</td>
       <td class="manual-blue">${l.manuals.blue||0}</td>
