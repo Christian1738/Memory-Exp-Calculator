@@ -7,7 +7,7 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #0a1c3a;
+  background: linear-gradient(145deg, #0a1c3a, #102750);
   color: #fff;
 }
 h1 {
@@ -157,7 +157,7 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-s
   <div class="card">
     <button id="toggleTableBtn">Show Detailed Table</button>
     <div class="details" id="detailsTable">
-      <h3>Detailed EXP & Promotion Table</h3>
+      <h3>Detailed EXP, Gold & Breakthrough Table</h3>
       <table>
         <thead>
           <tr>
@@ -168,6 +168,7 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-s
             <th class="manual-blue">Blue</th>
             <th class="manual-purple">Purple</th>
             <th class="manual-gold">Gold</th>
+            <th>Breakthrough</th>
           </tr>
         </thead>
         <tbody id="tableBody"></tbody>
@@ -181,16 +182,14 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-s
 <script>
 const EXP_VALUES = {green:100, blue:1000};
 
-// Corrected 60-70 Gold
 const levels = [
-  {range:"1-20", exp:{green:61, blue:0}, gold:12200, manuals:{}},
-  {range:"20-40", exp:{green:856, blue:0}, gold:171200, manuals:{green:8, blue:0, purple:0, gold:0}},
-  {range:"40-60", exp:{green:4100, blue:0}, gold:820000, manuals:{green:40, blue:12, purple:0, gold:0}},
-  {range:"60-70", exp:{green:574, blue:249}, gold:612800, manuals:{green:0, blue:50, purple:16, gold:0}},
-  {range:"70-80", exp:{green:4, blue:392}, gold:784800, manuals:{green:0, blue:0, purple:58, gold:20}}
+  {range:"1-20", exp:{green:61, blue:0}, gold:12200, manuals:{}, breakthrough:0},
+  {range:"20-40", exp:{green:856, blue:0}, gold:171200, manuals:{green:8, blue:0, purple:0, gold:0}, breakthrough:30000},
+  {range:"40-60", exp:{green:4100, blue:0}, gold:820000, manuals:{green:40, blue:12, purple:0, gold:0}, breakthrough:80000},
+  {range:"60-70", exp:{green:574, blue:249}, gold:612800, manuals:{green:0, blue:50, purple:16, gold:0}, breakthrough:200000},
+  {range:"70-80", exp:{green:4, blue:392}, gold:784800, manuals:{green:0, blue:0, purple:58, gold:20}, breakthrough:500000}
 ];
 
-// Elements
 const startLevelEl = document.getElementById("startLevel");
 const targetLevelEl = document.getElementById("targetLevel");
 const greenExpEl = document.getElementById("greenExp");
@@ -207,7 +206,6 @@ const tableBodyEl = document.getElementById("tableBody");
 const detailsTable = document.getElementById("detailsTable");
 const toggleTableBtn = document.getElementById("toggleTableBtn");
 
-// Toggle detailed table
 toggleTableBtn.addEventListener("click", () => {
   if(detailsTable.style.display === "none" || detailsTable.style.display === ""){
     detailsTable.style.display = "block";
@@ -218,7 +216,6 @@ toggleTableBtn.addEventListener("click", () => {
   }
 });
 
-// Copy results
 document.getElementById("copyBtn").addEventListener("click", () => {
   const text = `EXP Needed: ${expNeededEl.textContent}\nGold Needed: ${goldNeededEl.textContent}\n${promotionNeededEl.textContent}\n${manualEquivalentEl.textContent.replace(/<br>/g,"\n")}`;
   navigator.clipboard.writeText(text);
@@ -238,7 +235,7 @@ function calculate() {
       const expGreen = l.exp.green*EXP_VALUES.green;
       const expBlue = l.exp.blue*EXP_VALUES.blue;
       totalExp += expGreen + expBlue;
-      totalGold += l.gold;
+      totalGold += l.gold + (l.breakthrough||0);
       totalManuals.green += l.manuals.green||0;
       totalManuals.blue += l.manuals.blue||0;
       totalManuals.purple += l.manuals.purple||0;
@@ -259,7 +256,6 @@ function calculate() {
   let rem={...totalManuals};
   for(let k in rem) rem[k]=Math.max(rem[k]-userManuals[k],0);
 
-  // Conversion cascading
   let extra={green:Math.max(userManuals.green-totalManuals.green,0),
              blue:Math.max(userManuals.blue-totalManuals.blue,0),
              purple:Math.max(userManuals.purple-totalManuals.purple,0)};
@@ -307,7 +303,6 @@ function calculate() {
   expNeededEl.textContent = `EXP Needed: ${remainingExp}`;
   goldNeededEl.textContent = `Gold Needed: ${totalGold}`;
 
-  // Update detailed table
   tableBodyEl.innerHTML = "";
   levels.forEach(l=>{
     const expGreen = l.exp.green*EXP_VALUES.green;
@@ -319,7 +314,8 @@ function calculate() {
       <td class="manual-green">${l.manuals.green||0}</td>
       <td class="manual-blue">${l.manuals.blue||0}</td>
       <td class="manual-purple">${l.manuals.purple||0}</td>
-      <td class="manual-gold">${l.manuals.gold||0}</td>`;
+      <td class="manual-gold">${l.manuals.gold||0}</td>
+      <td>${l.breakthrough || 0}</td>`;
     tableBodyEl.appendChild(row);
   });
 }
