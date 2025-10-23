@@ -181,12 +181,12 @@ th, td { padding: 8px; text-align: center; border-bottom: 1px solid #fff; font-s
 <script>
 const EXP_VALUES = {green:100, blue:1000};
 
-// Adjust EXP for 60-70 (-800)
+// Corrected 60-70 Gold
 const levels = [
   {range:"1-20", exp:{green:61, blue:0}, gold:12200, manuals:{}},
   {range:"20-40", exp:{green:856, blue:0}, gold:171200, manuals:{green:8, blue:0, purple:0, gold:0}},
   {range:"40-60", exp:{green:4100, blue:0}, gold:820000, manuals:{green:40, blue:12, purple:0, gold:0}},
-  {range:"60-70", exp:{green:573, blue:249}, gold:613400, manuals:{green:0, blue:50, purple:16, gold:0}, adjust:-800},
+  {range:"60-70", exp:{green:573, blue:249}, gold:612800, manuals:{green:0, blue:50, purple:16, gold:0}},
   {range:"70-80", exp:{green:4, blue:392}, gold:784800, manuals:{green:0, blue:0, purple:58, gold:20}}
 ];
 
@@ -235,9 +235,8 @@ function calculate() {
     const levelStart = parseInt(l.range.split("-")[0]);
     const levelEnd = parseInt(l.range.split("-")[1]);
     if(start<levelEnd && target>levelStart){
-      let expGreen = l.exp.green*EXP_VALUES.green;
-      let expBlue = l.exp.blue*EXP_VALUES.blue;
-      if(l.adjust) expGreen = Math.max(expGreen - l.adjust,0); // adjust 60-70
+      const expGreen = l.exp.green*EXP_VALUES.green;
+      const expBlue = l.exp.blue*EXP_VALUES.blue;
       totalExp += expGreen + expBlue;
       totalGold += l.gold;
       totalManuals.green += l.manuals.green||0;
@@ -311,9 +310,8 @@ function calculate() {
   // Update detailed table
   tableBodyEl.innerHTML = "";
   levels.forEach(l=>{
-    let expGreen = l.exp.green*EXP_VALUES.green;
-    let expBlue = l.exp.blue*EXP_VALUES.blue;
-    if(l.adjust) expGreen = Math.max(expGreen - l.adjust,0);
+    const expGreen = l.exp.green*EXP_VALUES.green;
+    const expBlue = l.exp.blue*EXP_VALUES.blue;
     const row=document.createElement("tr");
     row.innerHTML=`<td>${l.range}</td>
       <td>${expGreen + expBlue}</td>
